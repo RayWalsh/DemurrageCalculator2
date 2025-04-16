@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Blue Laytime</title>
+
+  <!-- External CSS & Fonts -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://use.typekit.net/hks8wxj.css"> <!-- Apotek Font -->
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.4.0/dist/jspdf.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable" defer></script>
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header-bar">
+    <img src="https://i.imgur.com/E2lmjJu.png" alt="Deep Blue Logo" class="header-logo">
+    <h1>NEW CALC PAGE</h1>
+    <!-- Navigation Bar -->
+<nav class="navbar">
+  <ul>
+    <li><a href="home.html">Home</a></li>
+    <li><a href="case-management.html">Case Management</a></li>
+    <li><a href="calculator.html">Calculator</a></li>
+    <li><a href="new-case.html">New Case</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+</nav>
+
+  </header>
+
+  <!-- Main Application Container -->
+  <main id="app-container">
+    <!-- This is dynamically populated by JavaScript -->
+    <div id="app"></div>
+
+    <!-- Debug Log Section (if needed) -->
+    <section id="debug-section" class="debug-console">
+      <h2>Debug Log</h2>
+      <pre id="debugLog"></pre>
+    </section>
+  </main>
+
+  <!-- Debug Logging -->
+  <script>
+    console.log("Full URL:", window.location.href);
+    console.log("Query string:", window.location.search);
+    
+
+
+  </script>
+
+  <!-- Main JavaScript Application -->
+  <script src="main.js" type="module" defer></script>
+  <script type="module" src="./modules/populateCalculator.js"></script>
+
+</body>
+</html>

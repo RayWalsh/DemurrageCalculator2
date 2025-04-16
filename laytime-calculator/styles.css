@@ -1,0 +1,333 @@
+/* Global Styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.4;
+}
+
+h1 {
+  background-color: #004080;
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+}
+
+h2 {
+  color: #004080;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+/* Section Styling */
+.section {
+  background: white;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+/* Layout Structure */
+.flex-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.flex-container .section {
+  flex: 1 1 calc(50% - 20px);
+  min-width: 300px;
+}
+
+.port-management {
+  width: 100%; /* Span full width */
+  margin-top: 20px;
+}
+
+.results-notes {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.results-section,
+.notes-section {
+  flex: 1 1 calc(50% - 20px); /* Two sections per row */
+  min-width: 300px;
+}
+
+/* Logo Styling */
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #004080;
+  color: white;
+  padding: 5px 10px;
+  position: relative;
+  height: 50px;
+}
+
+.header-logo {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  height: 40px; /* Constrain logo height */
+  max-width: 150px; /* Constrain logo width */
+  object-fit: contain;
+}
+
+.header-bar h1 {
+  font-family: 'apotek', sans-serif;
+  font-size: 1.2em;
+  font-weight: normal;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* Laytime Section */
+#laytime-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#laytime-header {
+  display: flex;
+  justify-content: space-between; /* Align header content left and right */
+  align-items: center;
+}
+
+#laytime-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between rows */
+}
+
+.laytime-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between items */
+}
+
+#reversible {
+  margin-left: 10px;
+  transform: scale(0.9);
+}
+
+#updateRatesBtn {
+  width: auto;
+  padding: 5px 10px;
+  margin-left: auto; /* Push button to the right */
+}
+
+/* Input and Button Styling */
+input, textarea, button {
+  font-size: 12px;
+  margin: 5px 0;
+  width: auto; /* Prevent stretching */
+}
+
+button {
+  display: inline-block;
+  font-size: 12px;
+  padding: 5px 10px;
+  background-color: #004080;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #003060;
+}
+
+#addPortBtn {
+  width: auto;
+  margin-top: 10px;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th, td {
+  text-align: center;
+  padding: 5px;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #004080;
+  color: white;
+  font-weight: bold;
+}
+
+/* Debug Console */
+#debug-console {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+/* Minimal Tab Style */
+.tabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 2px solid #0051A3; /* Adds the tab underline */
+}
+
+.tab {
+  background-color: white;
+  border: 1px solid #0051A3;
+  border-bottom: none;
+  color: #0051A3;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px 5px 0 0;
+}
+
+.tab:hover {
+  background-color: #f0f0f0;
+}
+
+.tab.active {
+  background-color: #0051A3;
+  color: white}
+
+
+.tab-panel {
+  display: none;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #0051A3;
+  color: #fff;
+}
+
+.tabs-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tabs {
+  display: flex;
+}
+
+/* Icons Styling */
+.icons-container {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between icons */
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px; /* Larger icons */
+  position: relative; /* For positioning the tooltip */
+}
+
+.icon-button i {
+  font-style: normal; /* Remove italics */
+}
+
+.icon-button:hover {
+  color: #FFD700; /* Highlight on hover */
+}
+
+/* Tooltip Styling */
+.icon-button[title]:hover::after {
+  content: attr(title); /* Use the title attribute as tooltip content */
+  position: absolute;
+  bottom: 120%; /* Place above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 999;
+}
+
+.flex-container {
+  display: flex;
+  gap: 1rem; /* Add space between containers */
+  margin-top: 1rem; /* Add spacing above the container */
+}
+
+.results-container,
+.notes-container {
+  flex: 1; /* Equal width for both sections */
+}
+
+.notes-container textarea {
+  width: 100%;
+  height: 120px; /* Adjust as needed */
+}
+
+/*NAVIGATION STYLES
+
+/* Navigation Bar Styling */
+.navbar {
+  display: flex;
+  justify-content: center;
+  background-color: #004080;
+  padding: 10px 0;
+}
+
+.navbar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 20px;
+}
+
+.navbar li {
+  display: inline;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.navbar a:hover {
+  background-color: #003060;
+}
+
+/* END NAVIGATION STYLES
