@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOF Parser - Deep Blue</title>
+
+  <!-- External CSS & Fonts -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/hks8wxj.css" />
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.4.0/dist/jspdf.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable" defer></script>
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header-bar">
+    <img src="https://i.imgur.com/E2lmjJu.png" alt="Deep Blue Logo" class="header-logo" />
+    <h1>SOF Parser</h1>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="case-management.html">Case Management</a></li>
+        <li><a href="calculator.html">Calculator</a></li>
+        <li><a href="new-case.html">New Case</a></li>
+        <li><a href="sof-parser.html" class="active">SOF Parser</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Application Container -->
+  <main id="app-container">
+    <section>
+      <h2>Upload SOF PDF</h2>
+      <input type="file" id="pdfInput" accept="application/pdf" />
+      <button id="uploadBtn">Parse PDF</button>
+    </section>
+
+    <section>
+      <h2>Extracted Events</h2>
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>ISO Datetime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled in via JS -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Debug Log Section -->
+    <section id="debug-section" class="debug-console">
+      <h2>Debug Log</h2>
+      <pre id="debugLog"></pre>
+    </section>
+  </main>
+
+  <!-- JavaScript Module for SOF Parser Page -->
+  <script type="module" src="./modules/sofParser.js"></script>
+</body>
+</html>
