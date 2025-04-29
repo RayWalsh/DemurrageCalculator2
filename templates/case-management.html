@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Management</title>
+
+  <!-- Updated to use Flask static url_for -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='case-management.css') }}">
+</head>
+<body>
+<!-- Header Section -->
+<header class="header-bar">
+    <img src="https://i.imgur.com/E2lmjJu.png" alt="Deep Blue Logo" class="header-logo">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/case-management" class="active">Case Management</a></li>
+        <li><a href="/calculator">Calculator</a></li>
+        <li><a href="/new-case">New Case</a></li>
+        <li><a href="/sof-parser">SOF Parser</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+    </nav>
+</header>
+
+<!-- Main Content Section -->
+<main id="case-summary-container">
+  <h2>Case Management</h2>
+  <div id="case-summary-table">
+    <table id="caseSummaryTable">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Case ID</th>
+          <th>Account</th>
+          <th>Vessel Name</th>
+          <th>C/P Date</th>
+          <th>C/P Type</th>
+          <th>C/P Form</th>
+          <th>Owners Name</th>
+          <th>Brokers Name</th>
+          <th>Layday</th>
+          <th>Cancelling</th>
+          <th>Load Rate</th>
+          <th>Disch Rate</th>
+          <th>Demurrage Rate</th>
+          <th>Initial Claim</th>
+          <th>Notice Received</th>
+          <th>Claim Received</th>
+          <th>Voy End</th>
+          <th>Notice Days</th>
+          <th>Claim Days</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be dynamically populated here -->
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Link to your Case Management JavaScript -->
+<script src="{{ url_for('static', filename='modules/CaseManagement.js') }}"></script>
+</body>
+</html>
