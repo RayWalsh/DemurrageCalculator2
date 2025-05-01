@@ -34,7 +34,16 @@
   <main id="app-container">
     <!-- App content populated dynamically -->
     <div id="app"></div>
-
+    <!-- Save Modal -->
+  <div id="saveModal" class="modal">
+    <div class="modal-content">
+      <h3>Update Calculation</h3>
+      <p>What would you like to do?</p>
+      <button id="saveOnlyBtn">Save</button>
+      <button id="saveAndClearBtn">Save and Clear</button>
+      <button id="cancelSaveBtn">Cancel</button>
+    </div>
+  </div>
     <!-- Debug Log Section -->
     <section id="debug-section" class="debug-console">
       <h2>Debug Log</h2>
@@ -44,6 +53,5 @@
 
   <!-- Main JavaScript Application -->
     <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='modules/populateCalculator.js') }}"></script>
 </body>
 </html>

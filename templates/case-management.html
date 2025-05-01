@@ -51,7 +51,7 @@
           <th>Initial Claim</th>
           <th>Notice Received</th>
           <th>Claim Received</th>
-          <th>Voy End</th>
+          <th>Voyage End</th>
           <th>Notice Days</th>
           <th>Claim Days</th>
         </tr>
@@ -62,7 +62,118 @@
     </table>
   </div>
 </main>
+<!-- Edit Case Modal -->
+<div id="editCaseModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeEditModal">&times;</span>
+    <h2>Edit Case</h2>
+    <form id="edit-case-form">
 
+      <input type="hidden" id="editCaseID" />
+
+      <label for="editRef">Deep Blue Ref:</label>
+      <input type="text" id="editRef">
+
+      <label for="editAccount">Account:</label>
+      <input type="text" id="editAccount">
+
+      <label for="editVesselName">Vessel Name:</label>
+      <input type="text" id="editVesselName">
+
+      <label for="editVoyageNumber">Voyage Number:</label>
+      <input type="text" id="editVoyageNumber">
+
+      <label for="editVoyageEndDate">Voyage End Date:</label>
+      <input type="date" id="editVoyageEndDate">
+
+      <label for="editCPDate">C/P Date:</label>
+      <input type="date" id="editCPDate">
+
+      <label for="editCPType">C/P Type:</label>
+      <input type="text" id="editCPType">
+
+      <label for="editCPForm">C/P Form:</label>
+      <input type="text" id="editCPForm">
+
+      <label for="editOwnersName">Owners Name:</label>
+      <input type="text" id="editOwnersName">
+
+      <label for="editBrokersName">Brokers Name:</label>
+      <input type="text" id="editBrokersName">
+
+      <label for="editCharterersName">Charterers Name:</label>
+      <input type="text" id="editCharterersName">
+
+      <label for="editLayday">Layday:</label>
+      <input type="date" id="editLayday">
+
+      <label for="editCancelling">Cancelling:</label>
+      <input type="date" id="editCancelling">
+
+      <label for="editLoadRate">Load Rate (MTPH):</label>
+      <input type="number" id="editLoadRate">
+
+      <label for="editDischRate">Disch Rate (MTPH):</label>
+      <input type="number" id="editDischRate">
+
+      <label for="editDemurrageRate">Demurrage Rate (USD/day):</label>
+      <input type="number" id="editDemurrageRate">
+
+      <label for="editInitialClaim">Initial Claim (USD):</label>
+      <input type="number" id="editInitialClaim">
+
+      <label for="editNoticeReceived">Notice Received Date:</label>
+      <input type="date" id="editNoticeReceived">
+
+      <label for="editNoticeDays">Notice Days:</label>
+      <input type="number" id="editNoticeDays">
+
+      <label for="editClaimReceived">Claim Received Date:</label>
+      <input type="date" id="editClaimReceived">
+
+      <label for="editClaimDays">Claim Days:</label>
+      <input type="number" id="editClaimDays">
+
+      <label for="editContractType">Contract Type:</label>
+      <input type="text" id="editContractType">
+
+      <label for="editClaimType">Claim Type:</label>
+      <input type="text" id="editClaimType">
+
+      <label for="editClaimFiledAmount">Claim Filed Amount (USD):</label>
+      <input type="number" id="editClaimFiledAmount">
+
+      <label for="editClaimStatus">Claim Status:</label>
+      <input type="text" id="editClaimStatus">
+
+      <label for="editReversible">Reversible (0/1):</label>
+      <input type="number" min="0" max="1" id="editReversible">
+
+      <label for="editLumpsumHours">Lumpsum Hours:</label>
+      <input type="number" step="0.01" id="editLumpsumHours">
+
+      <label for="editCalculationType">Calculation Type:</label>
+      <input type="text" id="editCalculationType">
+
+      <label for="editTotalAllowedLaytime">Total Allowed Laytime:</label>
+      <input type="number" step="0.01" id="editTotalAllowedLaytime">
+
+      <label for="editTotalTimeUsed">Total Time Used:</label>
+      <input type="number" step="0.01" id="editTotalTimeUsed">
+
+      <label for="editTotalTimeOnDemurrage">Time on Demurrage:</label>
+      <input type="number" step="0.01" id="editTotalTimeOnDemurrage">
+
+      <label for="editTotalDemurrageCost">Total Demurrage Cost (USD):</label>
+      <input type="number" step="0.01" id="editTotalDemurrageCost">
+
+      <label for="editCalculatorNotes">Calculator Notes:</label>
+      <textarea id="editCalculatorNotes" rows="3"></textarea>
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
+</div>
 <!-- Link to your Case Management JavaScript -->
 <script src="{{ url_for('static', filename='modules/CaseManagement.js') }}"></script>
 </body>

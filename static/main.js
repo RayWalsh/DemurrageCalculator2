@@ -4,7 +4,10 @@ import { generateReport, generatePortReport } from './modules/ReportGenerator.js
 import { logDebug } from './modules/Logger.js';
 import { savePortToAirtable, loadPortsFromAirtable, deletePortFromAirtable } from "./modules/AirtablePortManager.js";
 
-
+function formatToDateInput(dateStr) {
+  const date = new Date(dateStr);
+  return isNaN(date) ? "" : date.toISOString().split("T")[0];
+}
 
 // Initial Render Function
 function renderApp() {
@@ -156,16 +159,27 @@ function renderApp() {
   // New Save event listener
 
   
-  document.getElementById("updateCalculationIcon").addEventListener("click", async () => {
-  console.log("Update Calculation clicked.");
-  try {
-      await Promise.all(state.ports.map((port) => savePortToAirtable(port)));
-      alert("Calculation updated successfully!");
-  } catch (error) {
-      console.error("Error updating calculation:", error);
-      alert("Failed to update calculation. Please try again.");
-  }
-  });
+// Attach modal functionality to Update Calculation button
+document.getElementById("updateCalculationIcon").addEventListener("click", () => {
+  document.getElementById("saveModal").style.display = "block";
+});
+
+// Cancel button closes modal
+document.getElementById("cancelSaveBtn").addEventListener("click", () => {
+  document.getElementById("saveModal").style.display = "none";
+});
+
+// Save only (no clear)
+document.getElementById("saveOnlyBtn").addEventListener("click", async () => {
+  document.getElementById("saveModal").style.display = "none";
+  await handleSave(false);
+});
+
+// Save and clear
+document.getElementById("saveAndClearBtn").addEventListener("click", async () => {
+  document.getElementById("saveModal").style.display = "none";
+  await handleSave(true);
+});
 
   // end new save event listener 
 
@@ -210,6 +224,329 @@ window.addNewPort = () => {
     logDebug(`Error in addNewPort: ${error.message}`);
   }
 };
+
+async function saveCalculationToSQL() {
+  const caseId = document.getElementById("caseNumber").value.trim();
+  if (!caseId) throw new Error("Case ID is required to save.");
+
+  const payload = {
+    DeepBlueRef: caseId,
+    ClientName: document.getElementById("account").value.trim(),
+    VesselName: document.getElementById("vesselName").value.trim(),
+    CPDate: document.getElementById("cpDate").value || null,
+    LoadingRate: parseFloat(document.getElementById("loadingRate").value) || 0,
+    DischargingRate: parseFloat(document.getElementById("dischargingRate").value) || 0,
+    DemurrageRate: parseFloat(document.getElementById("demurrageRate").value) || 0,
+    CPType: "",  // Optional field if you're not using it yet
+    ContractType: "",  // Optional, same here
+    ClaimType: "",     // Optional
+    ClaimStatus: "",   // Optional
+    ClaimFiledAmount: 0,  // Optional
+
+    Reversible: document.getElementById("reversible").checked ? 1 : 0,
+    LumpsumHours: parseFloat(document.getElementById("lumpsumHours").value) || 0,
+    CalculationType: document.getElementById("lumpsumRadio").checked ? "Lump" : "Rate",
+    TotalAllowedLaytime: parseFloat(document.getElementById("totalAllowed").textContent) || 0,
+    TotalTimeUsed: parseFloat(document.getElementById("totalUsed").textContent) || 0,
+    TotalTimeOnDemurrage: parseFloat(document.getElementById("timeOnDemurrage").textContent) || 0,
+    TotalDemurrageCost: parseFloat(document.getElementById("demurrageCost").textContent) || 0,
+    CalculatorNotes: document.getElementById("notes").value.trim()
+  };
+
+  const response = await fetch(`/api/update-case/${caseId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to save calculation.");
+  }
+}
+
+async function handleSave(shouldClear = false) {
+  const caseId = document.getElementById("caseNumber").value.trim();
+  if (!caseId) {
+    alert("Case Number is required.");
+    return;
+  }
+
+  try {
+    const existsRes = await fetch(`/api/case-exists/${caseId}`);
+    const existsData = await existsRes.json();
+
+    if (!existsData.exists) {
+      const confirmed = confirm(`No Case currently exists for '${caseId}'.\nWould you like to create one?`);
+      if (!confirmed) return;
+    }
+
+    // Save calculation (main case info)
+    await saveCalculationToSQL();
+
+    // Save ports to Ports table
+    await savePortsToSQL();
+
+    if (shouldClear) {
+      clearCalculator();
+      alert("Saved and calculator cleared.");
+    } else {
+      alert("Calculation and ports saved to database.");
+    }
+
+  } catch (err) {
+    console.error("Save failed:", err);
+    alert("Failed to save. See console.");
+  }
+}
+
+function clearCalculator() {
+  // Reset Contract Info
+  document.getElementById("caseNumber").value = "";
+  document.getElementById("account").value = "";
+  document.getElementById("vesselName").value = "";
+  document.getElementById("cpDate").value = "";
+  document.getElementById("lumpsumHours").value = "";
+  document.getElementById("loadingRate").value = "150";
+  document.getElementById("dischargingRate").value = "100";
+  document.getElementById("demurrageRate").value = "24000";
+  document.getElementById("notes").value = "";
+  document.getElementById("reversible").checked = true;
+  document.getElementById("lumpsumRadio").checked = false;
+  document.getElementById("ratesRadio").checked = true;
+
+  // Clear state and DOM
+  state.ports = [];
+  const portsContainer = document.getElementById("ports");
+  const tabs = document.getElementById("tabs");
+  const tabContent = document.getElementById("tab-content");
+
+  portsContainer.innerHTML = "";
+  tabContent.querySelectorAll(".tab-panel").forEach((el) => {
+    if (el.id !== "summary") el.remove();
+  });
+  tabs.querySelectorAll(".tab").forEach((el) => {
+    if (!el.dataset.tab || el.dataset.tab === "summary") return;
+    el.remove();
+  });
+
+  // Reset summary section
+  document.getElementById("totalAllowed").textContent = "0.0000000";
+  document.getElementById("totalUsed").textContent = "0.0000000";
+  document.getElementById("timeOnDemurrage").textContent = "0.0000000";
+  document.getElementById("demurrageCost").textContent = "0.00";
+  document.getElementById("summary-results").innerHTML = "";
+
+  localStorage.removeItem("calculatorDraft");
+
+  logDebug("Calculator cleared successfully.");
+}
+
+async function loadCaseFromSQL(caseRef) {
+  try {
+    const res = await fetch(`/api/get-case/${caseRef}`);
+    if (!res.ok) throw new Error("Failed to fetch case");
+
+    const data = await res.json();
+
+    document.getElementById("caseNumber").value = data.DeepBlueRef || "";
+    document.getElementById("account").value = data.ClientName || "";
+    document.getElementById("vesselName").value = data.VesselName || "";
+    document.getElementById("cpDate").value = formatToDateInput(data.CPDate);
+    document.getElementById("loadingRate").value = data.LoadingRate || "";
+    document.getElementById("dischargingRate").value = data.DischargingRate || "";
+    document.getElementById("demurrageRate").value = data.DemurrageRate || "";
+    document.getElementById("reversible").checked = data.Reversible === 1;
+    document.getElementById("lumpsumHours").value = data.LumpsumHours || "";
+    document.getElementById("notes").value = data.CalculatorNotes || "";
+
+    if (data.CalculationType === "Lump") {
+      document.getElementById("lumpsumRadio").checked = true;
+      document.getElementById("ratesRadio").checked = false;
+    } else {
+      document.getElementById("lumpsumRadio").checked = false;
+      document.getElementById("ratesRadio").checked = true;
+    }
+
+    state.contract.dailyRate = parseFloat(data.DemurrageRate) || 0;
+
+    calculateResults(); // Refresh output
+  } catch (err) {
+    console.error("Error loading contract info:", err);
+    alert("Could not load case details.");
+  }
+}
+
+async function savePortsToSQL() {
+  const caseId = document.getElementById("caseNumber").value.trim();
+  if (!caseId) throw new Error("Case Number is required for saving ports.");
+
+  // Prepare the payload to send to /api/save-ports
+  const portPayload = state.ports.map(port => ({
+    name: port.name || "",
+    cargoQty: port.cargoQty || 0,
+    portType: port.portType || "",
+    allowedLaytime: port.allowedLaytime || 0,
+    timeUsed: port.timeUsed || 0,
+    timeOnDemurrage: port.timeOnDemurrage || 0,
+    portDemurrageCost: port.portDemurrageCost || 0,
+    notes: port.notes || ""
+  }));
+
+  const response = await fetch(`/api/save-ports/${caseId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(portPayload)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to save ports.");
+  }
+
+  const savedPorts = await response.json(); // Contains array of { portId, ... }
+
+  console.log(`Saved ${savedPorts.length} ports for ${caseId}`);
+  console.log("Returned SQL port IDs:", savedPorts);
+
+  // Match frontend ports with backend SQL PortIDs using array index
+  for (let i = 0; i < savedPorts.length; i++) {
+    const frontendPort = state.ports[i];
+    const backendPortId = savedPorts[i].PortID;
+
+    if (!backendPortId) {
+      console.warn(`No SQL PortID returned for port index ${i}. Skipping event/deduction save.`);
+      continue;
+    }
+
+    // Save events
+    await fetch(`/api/save-events/${backendPortId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        (frontendPort.events || []).map((ev, idx) => ({
+          ...ev,
+          displayOrder: idx
+        }))
+      )
+    });
+
+    // Save deductions with displayOrder
+    await fetch(`/api/save-deductions/${backendPortId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        (frontendPort.deductions || []).map((deduction, idx) => ({
+          ...deduction,
+          displayOrder: idx
+        }))
+  )
+});
+
+    console.log(`Events and deductions saved for port SQL ID ${backendPortId}`);
+  }
+}
+
+async function saveEventsForPort(portId, events) {
+  const response = await fetch(`/api/save-events/${portId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(events),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to save events.");
+  }
+}
+
+async function saveDeductionsForPort(portId, deductions) {
+  const response = await fetch(`/api/save-deductions/${portId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(deductions),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to save deductions.");
+  }
+}
+
+async function loadPortsFromSQL(caseRef) {
+  try {
+    const response = await fetch(`/api/get-ports/${caseRef}`);
+    if (!response.ok) throw new Error("Failed to load ports");
+
+    const ports = await response.json();
+    const enrichedPorts = [];
+
+    for (const port of ports) {
+      const portId = port.PortID;
+
+      // Fetch events
+      const eventsRes = await fetch(`/api/get-events/${portId}`);
+      const events = eventsRes.ok ? await eventsRes.json() : [];
+
+      // Fetch deductions
+      const dedRes = await fetch(`/api/get-deductions/${portId}`);
+      const deductions = dedRes.ok ? await dedRes.json() : [];
+
+      enrichedPorts.push({
+        id: Date.now() + Math.floor(Math.random() * 100000), // client ID
+        name: port.PortName,
+        cargoQty: port.CargoQty,
+        portType: port.PortType,
+        allowedLaytime: port.AllowedLaytime,
+        timeUsed: port.TimeUsed,
+        timeOnDemurrage: port.TimeOnDemurrage,
+        portDemurrageCost: port.PortDemurrageCost,
+        notes: port.Notes,
+        events: events.map((e) => ({
+          event: e.EventName,
+          datetime: e.EventTime ? new Date(e.EventTime).toISOString().slice(0, 16) : "",
+          type: e.EventType,
+          remarks: e.Remarks,
+        })),
+        deductions: deductions.map((d) => ({
+          reason: d.Reason,
+          start: d.StartTime ? new Date(d.StartTime).toISOString().slice(0, 16) : "",
+          end: d.EndTime ? new Date(d.EndTime).toISOString().slice(0, 16) : ""
+        })),
+      });
+    }
+
+    state.ports = enrichedPorts;
+
+    // Render updated UI
+    state.ports.forEach(addPortTab);
+    renderPorts();
+    renderSummaryResults();
+    calculateResults();
+  } catch (err) {
+    console.error("Error loading ports with events/deductions:", err);
+    alert("Could not load port details.");
+  }
+}
+
+async function confirmAndLoadCase(caseRef) {
+  const currentRef = document.getElementById("caseNumber").value.trim();
+
+  if (hasUnsavedChanges() && caseRef !== currentRef) {
+    const confirmSwitch = confirm(
+      `You have unsaved changes for '${currentRef || "your current case"}'.\n\n` +
+      `Do you want to discard them and load case '${caseRef}' instead?`
+    );
+    if (!confirmSwitch) return;
+  }
+
+  clearCalculator(); // optional: clean UI before loading
+  await loadCaseFromSQL(caseRef); // <-- New function to load contract details
+  await loadPortsFromSQL(caseRef); // Already working
+
+  // Optionally: also load contract info from SQL here if needed
+  document.getElementById("caseNumber").value = caseRef;
+}
 
 function loadDraftCalculation() {
   console.log("Attempting to load draft calculation...");
@@ -288,7 +625,7 @@ function renderPorts() {
         </select>
       </td>
       <td>${allowedLaytime.toFixed(7)}</td>
-      <td>${port.timeUsed ? port.timeUsed.toFixed(7) : "0.0000000"}</td> <!-- Safely handle "Time Used" -->
+      <td>${!isNaN(parseFloat(port.timeUsed)) ? parseFloat(port.timeUsed).toFixed(7) : "0.0000000"}</td>
       <td>${timeOnDemurrage.toFixed(7)}</td>
       <td><button onclick="removePort(${port.id})">Delete</button></td>
     `;
@@ -1128,7 +1465,30 @@ renderPorts();
 calculateResults();
 setupAutoSave();
 
+// Load case if a reference was passed from Case Management
+const refToLoad = localStorage.getItem("currentCaseRef");
+if (refToLoad) {
+  confirmAndLoadCase(refToLoad);
+  // Do NOT remove it — we want the same case to reload if user comes back later
+}
+
 // ====== AUTOSAVE SETUP ======
+
+function hasUnsavedChanges() {
+  const draft = JSON.parse(localStorage.getItem("calculatorDraft"));
+
+  // Check if there’s a draft and it’s not empty
+  if (!draft || !draft.contract || !draft.ports) return false;
+
+  // If any contract field is filled
+  const contract = draft.contract;
+  const contractFieldsChanged = Object.values(contract).some(value => value && value !== "");
+
+  // If any ports exist
+  const portsChanged = Array.isArray(draft.ports) && draft.ports.length > 0;
+
+  return contractFieldsChanged || portsChanged;
+}
 
 // Save the current calculator state to localStorage
 function saveDraftToLocalStorage() {
@@ -1181,3 +1541,11 @@ function setupAutoSave() {
 
   console.log("Auto-save setup complete.");
 }
+
+window.addEventListener("beforeunload", function (e) {
+  if (hasUnsavedChanges()) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';  // For legacy browser support
+  }
+});

@@ -389,3 +389,69 @@ th {
 .sof-modal-content button:hover {
   background-color: #003060;
 }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 10px 15px;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+  background-color: #fff;
+  border-radius: 6px;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  text-align: right;
+  margin-top: 20px;
+}
+
+/* Spinner Styles */
+#spinner {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  margin-top: -25px; /* Half of height */
+  margin-left: -25px; /* Half of width */
+  border: 6px solid #f3f3f3; /* Light grey */
+  border-top: 6px solid #3498db; /* Blue color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 1000; /* Appear above everything */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Save Modal Styles - Specific to Calculator Page */
+#saveModal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#saveModal .modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 300px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+#saveModal .modal-content button {
+  margin: 10px 5px;
+  padding: 10px 16px;
+}

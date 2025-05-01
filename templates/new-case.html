@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>New Case | Deep Blue Laytime</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="https://use.typekit.net/hks8wxj.css" /> <!-- Apotek Font -->
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header-bar">
+      <img src="https://i.imgur.com/E2lmjJu.png" alt="Deep Blue Logo" class="header-logo" />
+      <h1>Laytime Calculator</h1>
+      <nav class="navbar">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/case-management">Case Management</a></li>
+          <li><a href="/calculator">Calculator</a></li>
+          <li><a href="/new-case" class="active">New Case</a></li>
+          <li><a href="/sof-parser">SOF Parser</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main id="app-container">
+      <h2>New Case Form</h2>
+      <div id="spinner" class="spinner" style="display:none;"></div>
+      <form id="new-case-form" class="form-grid">
+    
+        <label for="ref">Deep Blue Ref No:</label>
+        <input id="ref" name="ref" type="text" required>
+    
+        <label for="client">Client Name:</label>
+        <select id="client" name="client">
+          <option value="">-- Select Client --</option>
+          <option value="Sokana3">Sokana3</option>
+          <option value="Eastport USA LLC">Eastport USA LLC</option>
+          <option value="Norstar">Norstar</option>
+          <option value="Luberef">Luberef</option>
+          <option value="Peregrine Tankers">Peregrine Tankers</option>
+          <option value="OQ Trading">OQ Trading</option>
+        </select>
+    
+        <label for="ship">Ship Name:</label>
+        <input id="ship" name="ship" type="text" required>
+    
+        <label for="voyage">Voyage Number:</label>
+        <input id="voyage" name="voyage" type="text">
+    
+        <label for="endDate">Voyage End Date:</label>
+        <input id="endDate" name="endDate" type="date">
+    
+        <label for="contractDate">Contract Date:</label>
+        <input id="contractDate" name="contractDate" type="date" required>
+    
+        <label for="broker">Broker's Name:</label>
+        <input id="broker" name="broker" type="text" required>
+    
+        <label for="charterer">Charterer's Name:</label>
+        <select id="charterer" name="charterer">
+          <option value="">-- Select Charterer --</option>
+          <!-- Options will be dynamically populated -->
+        </select>
+    
+        <label for="receivedDate">Claim Received Date:</label>
+        <input id="receivedDate" name="receivedDate" type="date">
+    
+        <label for="contractType">Contract Type:</label>
+        <select id="contractType" name="contractType">
+          <option value="CP">CP</option>
+          <option value="COA">COA</option>
+          <option value="FOB">FOB</option>
+          <option value="CIF">CIF</option>
+        </select>
+    
+        <label for="claimType">Claim Type:</label>
+        <select id="claimType" name="claimType">
+          <option value="Demurrage">Demurrage</option>
+          <option value="Rebill">Rebill</option>
+          <option value="GeneralExpenses">General Expenses</option>
+          <option value="Brokers">Brokers</option>
+        </select>
+    
+        <label for="claimAmount">Claim Filed Amount (USD):</label>
+        <input id="claimAmount" name="claimAmount" type="number">
+    
+        <label for="claimStatus">Claim Status:</label>
+        <select id="claimStatus" name="claimStatus">
+          <option value="1. Documents Received">1. Documents Received</option>
+          <option value="2. Nil Demurrage (No Claim)">2. Nil Demurrage (No Claim)</option>
+          <option value="3. Pending Info from Owners">3. Pending Info from Owners</option>
+          <option value="4. Calculation Sent to Owners">4. Calculation Sent to Owners</option>
+          <option value="5. Claim Filed">5. Claim Filed</option>
+        </select>
+    
+        <div class="form-actions">
+          <button type="submit" id="submitToAirtable">Submit to Airtable</button>
+        </div>
+      </form>
+    
+      <section id="debug-section" class="debug-console">
+        <h2>Debug Log</h2>
+        <pre id="debugLog"></pre>
+      </section>
+    </main>
+
+    <div id="spinner"></div>
+    <!-- JavaScript Handler -->
+    <script type="module" src="{{ url_for('static', filename='newCaseHandler.js') }}"></script>
+  </body>
+</html>
