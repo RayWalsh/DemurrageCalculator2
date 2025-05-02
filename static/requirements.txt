@@ -1,5 +1,8 @@
 flask
 requests
 gunicorn
-python-dotenv
-azure-ai-formrecognizer
+azure-core
+azure-ai-documentintelligence
+pandas
+pyodbc
+xlsxwriter
