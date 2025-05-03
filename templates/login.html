@@ -4,25 +4,35 @@
     <meta charset="UTF-8">
     <title>Demuro Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #f4f7fa;
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
+        h1, h2, h3, .left-panel h1 {
+            font-family: 'Montserrat', sans-serif;
+        }
+
         .left-panel {
             width: 50%;
-            background-color: #0e3a6d;
             color: white;
             padding: 60px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
+        }
+
+        .custom-login-bg {
+            background: linear-gradient(to bottom, rgba(14, 58, 109, 0.9), rgba(14, 58, 109, 0.9)), 
+                        url("{{ url_for('static', filename='images/LoginPageImage.PNG') }}") no-repeat center center;
+            background-size: cover;
         }
 
         .left-panel img {
@@ -34,6 +44,7 @@
         .left-panel h1 {
             font-size: 36px;
             margin-bottom: 10px;
+            font-style: italic;
         }
 
         .left-panel p {
@@ -147,7 +158,7 @@
 </head>
 <body>
 
-<div class="left-panel">
+<div class="left-panel custom-login-bg">
     <img src="{{ url_for('static', filename='images/DBS-Icon.png') }}" alt="DBS Logo">
     <h1>Hello Demuro!</h1>
     <p>Making laytime calculations seamless. Automate time sheets, demurrage tracking, and charter party compliance with confidence.</p>
@@ -173,7 +184,7 @@
         </form>
 
         <div class="links">
-            <p><a href="{{ url_for('register') }}">New user? Register here</a></p>
+            <p><a href="#" onclick="openRegisterModal()">New user? Register here</a></p>
             <p><a href="#" onclick="openModal()">Forgot password?</a></p>
         </div>
     </div>
@@ -199,6 +210,34 @@
     </div>
 </div>
 
+<!-- Register Modal -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRegisterModal()">&times;</span>
+        <h3>Register New User</h3>
+        <form method="post" action="/register">
+            <label for="register-key">Secret Key</label>
+            <input type="text" name="secret_key" id="register-key" required>
+
+            <label for="register-username">Username</label>
+            <input type="text" name="username" id="register-username" required>
+
+            <label for="register-email">Email</label>
+            <input type="email" name="email" id="register-email" required>
+
+            <label for="register-password">Password</label>
+            <input type="password" name="password" id="register-password" required oninput="checkRegisterPasswordStrength()">
+            <small id="register-strength-msg" style="font-size: 12px;"></small>
+
+            <div class="show-password" style="margin-top: 8px; font-size: 14px;">
+                <input type="checkbox" id="register-show-password" onclick="toggleRegisterPassword()"> Show Password
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</div>
+
 <script>
     function openModal() {
         document.getElementById("forgotModal").style.display = "block";
@@ -208,11 +247,48 @@
         document.getElementById("forgotModal").style.display = "none";
     }
 
+    function openRegisterModal() {
+        document.getElementById("registerModal").style.display = "block";
+    }
+
+    function closeRegisterModal() {
+        document.getElementById("registerModal").style.display = "none";
+    }
+
     window.onclick = function(event) {
-        const modal = document.getElementById("forgotModal");
-        if (event.target === modal) {
-            modal.style.display = "none";
+        const forgotModal = document.getElementById("forgotModal");
+        const registerModal = document.getElementById("registerModal");
+        if (event.target === forgotModal) forgotModal.style.display = "none";
+        if (event.target === registerModal) registerModal.style.display = "none";
+    }
+
+    function checkRegisterPasswordStrength() {
+        const password = document.getElementById("register-password").value;
+        const strengthMsg = document.getElementById("register-strength-msg");
+
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        if (strength === 0) {
+            strengthMsg.textContent = "";
+        } else if (strength <= 1) {
+            strengthMsg.textContent = "Weak password";
+            strengthMsg.style.color = "red";
+        } else if (strength === 2) {
+            strengthMsg.textContent = "Moderate password";
+            strengthMsg.style.color = "orange";
+        } else {
+            strengthMsg.textContent = "Strong password";
+            strengthMsg.style.color = "green";
         }
+    }
+
+    function toggleRegisterPassword() {
+        const pw = document.getElementById("register-password");
+        pw.type = pw.type === "password" ? "text" : "password";
     }
 </script>
 
