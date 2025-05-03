@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demuro Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            width: 50%;
+            background-color: #0e3a6d;
+            color: white;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .left-panel img {
+            width: 80px;
+            margin-bottom: 30px;
+        }
+
+        .left-panel h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .left-panel p {
+            font-size: 18px;
+            line-height: 1.5;
+            max-width: 400px;
+        }
+
+        .right-panel {
+            width: 50%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .login-box {
+            width: 350px;
+            padding: 30px 40px;
+            background: white;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005fa3;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #0078D7;
+            text-decoration: none;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 350px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div class="left-panel">
+    <img src="{{ url_for('static', filename='DBS-Icon.jpeg') }}" alt="DBS Logo">
+    <h1>Hello Demuro!</h1>
+    <p>Making laytime calculations seamless. Automate time sheets, demurrage tracking, and charter party compliance with confidence.</p>
+</div>
+
+<div class="right-panel">
+    <div class="login-box">
+        <h2>Welcome Back</h2>
+        <p class="status {% if '✅' in db_status %}green{% else %}red{% endif %}">{{ db_status }}</p>
+
+        <form method="post">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+
+            <button type="submit">Log In</button>
+        </form>
+
+        <div class="links">
+            <p><a href="{{ url_for('register') }}">New user? Register here</a></p>
+            <p><a href="#" onclick="openModal()">Forgot password?</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgotModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Reset Your Password</h3>
+        <form method="post" action="/forgot-password">
+            <label for="reset-username">Username</label>
+            <input type="text" name="username" id="reset-username" required>
+
+            <label for="reset-email">Email</label>
+            <input type="email" name="email" id="reset-email" required>
+
+            <label for="reset-password">New Password</label>
+            <input type="password" name="new_password" id="reset-password" required>
+
+            <button type="submit">Reset Password</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById("forgotModal").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("forgotModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("forgotModal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

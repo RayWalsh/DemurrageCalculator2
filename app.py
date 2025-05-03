@@ -6,12 +6,14 @@ import pyodbc
 from io import BytesIO
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.documentintelligence import DocumentIntelligenceClient
-
+from flask import Flask, request, render_template, redirect, url_for, session
+from passlib.hash import pbkdf2_sha256
 
 
 
 
 app = Flask(__name__)
+app.secret_key = 'super-secret-key'  # Replace with a real secret in production
 
 # Azure SQL Connection string
 conn_str = (
@@ -47,26 +49,38 @@ WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", 
 
 @app.route('/')
 def home():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     return render_template('home.html')
 
 @app.route('/case-management')
 def case_management():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     return render_template('case-management.html')
 
 @app.route('/calculator')
 def calculator():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     return render_template('calculator.html')
 
 @app.route('/new-case')
 def new_case():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     return render_template('new-case.html')
 
 @app.route('/sof-parser')
 def sof_parser():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     return render_template('sofparser.html')
 
 @app.route('/about')
 def about():
+    if 'username' not in session:
+        return redirect(url_for('login'))
     return render_template('about.html')
 
 
@@ -580,6 +594,135 @@ def case_exists(ref):
         return jsonify({"exists": exists}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+    # === LOGIN LOGIC ===
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    error = None
+    success = None
+
+    if request.method == 'POST':
+        secret_key = request.form['secret_key']
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+
+        if secret_key != "SHINC":
+            error = "Invalid secret key."
+        else:
+            hashed_pw = pbkdf2_sha256.hash(password)
+            try:
+                conn = pyodbc.connect(conn_str)
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO Users (Username, Email, HashedPassword, IsActive)
+                    VALUES (?, ?, ?, 1)
+                """, (username, email, hashed_pw))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                success = "Registration successful! You can now log in."
+            except Exception as e:
+                error = f"Registration failed: {str(e)}"
+
+    return render_template('register.html', error=error, success=success)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    db_status = "Checking connection..."
+
+    # Test database connection
+    try:
+        conn = pyodbc.connect(conn_str)
+        db_status = "✅ Connected to database"
+        db_ok = True
+    except Exception as e:
+        print("DB connection error:", e)
+        db_status = "❌ Database connection failed"
+        db_ok = False
+
+    # Only proceed if DB connection is good
+    if request.method == 'POST' and db_ok:
+        username = request.form['username']
+        password = request.form['password']
+        print(f"Username submitted: {username}")
+        print(f"Password submitted: {password}")
+
+        try:
+            conn = pyodbc.connect(conn_str)
+            cursor = conn.cursor()
+            cursor.execute("SELECT HashedPassword FROM Users WHERE Username = ? AND IsActive = 1", username)
+            row = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            if row:
+                hashed_pw = row[0]
+                print("Fetched hash from DB:", hashed_pw)
+                print("Raw hash repr:", repr(hashed_pw))
+                print("Password entered repr:", repr(password))
+
+                # Decode if it's bytes
+                if isinstance(hashed_pw, bytes):
+                    hashed_pw = hashed_pw.decode('utf-8')
+
+                # Perform password verification
+                if hashed_pw and pbkdf2_sha256.verify(password, hashed_pw.strip()):
+                    print("✅ Password match — logging in.")
+                    session['username'] = username
+                    return redirect(url_for('home'))
+                else:
+                    print("❌ Password mismatch.")
+                    error = 'Invalid username or password.'
+            else:
+                print("❌ No matching user found.")
+                error = 'Invalid username or password.'
+
+        except Exception as e:
+            print("Login logic error:", str(e))
+            error = 'Login failed due to a server error.'
+
+    return render_template('login.html', error=error, db_status=db_status)
+
+from passlib.hash import pbkdf2_sha256
+
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    username = request.form.get('username')
+    email = request.form.get('email')
+    new_password = request.form.get('new_password')
+    hashed_password = pbkdf2_sha256.hash(new_password)
+
+    try:
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Verify that the username and email match
+        cursor.execute("SELECT 1 FROM Users WHERE Username = ? AND Email = ?", (username, email))
+        if cursor.fetchone() is None:
+            return render_template('login.html', error="Username and email do not match.")
+
+        # Now update password
+        cursor.execute("UPDATE Users SET HashedPassword = ? WHERE Username = ?", hashed_password, username)
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        print(f"Password for {username} was successfully reset.")
+        return redirect(url_for('login'))
+
+    except Exception as e:
+        print("Password reset error:", str(e))
+        return render_template('login.html', error="Failed to reset password.")
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('login'))
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
