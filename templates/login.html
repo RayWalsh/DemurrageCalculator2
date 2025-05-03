@@ -28,6 +28,7 @@
         .left-panel img {
             width: 80px;
             margin-bottom: 30px;
+            filter: brightness(0) invert(1);
         }
 
         .left-panel h1 {
@@ -147,7 +148,7 @@
 <body>
 
 <div class="left-panel">
-    <img src="{{ url_for('static', filename='DBS-Icon.jpeg') }}" alt="DBS Logo">
+    <img src="{{ url_for('static', filename='images/DBS-Icon.png') }}" alt="DBS Logo">
     <h1>Hello Demuro!</h1>
     <p>Making laytime calculations seamless. Automate time sheets, demurrage tracking, and charter party compliance with confidence.</p>
 </div>
