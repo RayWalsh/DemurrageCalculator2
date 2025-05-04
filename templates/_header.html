@@ -1,0 +1,50 @@
+<!-- templates/_header.html -->
+<header class="header-bar">
+    <div class="header-container">
+      <div class="header-left">
+        <img src="{{ url_for('static', filename='images/DBS-Icon.png') }}" alt="Deep Blue Logo" class="header-logo white-logo" />
+        
+      </div>
+  
+      <nav class="navbar">
+        <ul>
+          <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a></li>
+          <li><a href="/case-management" class="{% if request.path == '/case-management' %}active{% endif %}">Case Management</a></li>
+          <li><a href="/calculator" class="{% if request.path == '/calculator' %}active{% endif %}">Calculator</a></li>
+          <li><a href="/new-case" class="{% if request.path == '/new-case' %}active{% endif %}">New Case</a></li>
+          <li><a href="/sof-parser" class="{% if request.path == '/sof-parser' %}active{% endif %}">SOF Parser</a></li>
+          <li><a href="/about" class="{% if request.path == '/about' %}active{% endif %}">About</a></li>
+        </ul>
+      </nav>
+  
+      <div class="header-right">
+        <div class="user-menu">
+          <div class="user-icon" onclick="toggleDropdown()">
+            {{ user.initials if user else "??" }}
+          </div>
+          <div id="dropdown" class="dropdown-content">
+            <p class="dropdown-name">{{ user.company_name }}</p>
+            <p>{{ user.name }}</p>
+            <p>{{ user.email }}</p>
+            <a href="#">View Account</a>
+            <a href="/logout">Sign Out</a>
+            <!-- <a href="/logout">Sign Out</a> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <script>
+    function toggleDropdown() {
+      const dropdown = document.getElementById("dropdown");
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+  
+    window.addEventListener("click", function (event) {
+      const dropdown = document.getElementById("dropdown");
+      if (!event.target.closest(".user-menu")) {
+        dropdown.style.display = "none";
+      }
+    });
+  </script>

@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Deep Blue Laytime</title>
       
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
         <link rel="stylesheet" href="https://use.typekit.net/hks8wxj.css"> <!-- Apotek Font -->
@@ -12,23 +11,7 @@
         <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable" defer></script>
       </head>
 <body>
-  <!-- Header Section -->
-  <header class="header-bar">
-    <img src="https://i.imgur.com/E2lmjJu.png" alt="Deep Blue Logo" class="header-logo">
-    <h1>Laytime Calculator</h1>
-
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/case-management">Case Management</a></li>
-        <li><a href="/calculator" class="active">Calculator</a></li>
-        <li><a href="/new-case">New Case</a></li>
-        <li><a href="/sof-parser">SOF Parser</a></li>
-        <li><a href="/about">About</a></li>
-      </ul>
-    </nav>
-  </header>
+  {% include '_header.html' %}
 
   <!-- Main Application Container -->
   <main id="app-container">

@@ -722,7 +722,27 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-
+@app.context_processor
+def inject_user():
+    if 'username' in session:
+        try:
+            conn = pyodbc.connect(conn_str)
+            cursor = conn.cursor()
+            cursor.execute("SELECT Username, Email, CompanyName FROM Users WHERE Username = ?", (session['username'],))
+            row = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if row:
+                user_data = {
+                    "name": row[0],
+                    "email": row[1],
+                    "company_name": row[2] if row[2] else "Deep Blue",
+                    "initials": "".join([word[0].upper() for word in row[0].split() if word])
+                }
+                return dict(user=user_data)
+        except Exception as e:
+            print("User context fetch error:", str(e))
+    return dict(user=None)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
