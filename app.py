@@ -566,16 +566,137 @@ def get_cases():
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
 
-        # Fetch all rows from the Cases table
-        cursor.execute("SELECT * FROM Cases")
-        columns = [column[0] for column in cursor.description]  # Get column names
-        cases = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        cursor.execute("""
+            SELECT 
+                CaseID,
+                DeepBlueRef,
+                ClientName,
+                VesselName,
+                VoyageNumber,
+                VoyageEndDate,
+                CPDate,
+                CPType,
+                CPForm,
+                OwnersName,
+                BrokersName,
+                CharterersName,
+                Layday,
+                Cancelling,
+                LoadRate,
+                DischRate,
+                DemurrageRate,
+                InitialClaim,
+                NoticeReceived,
+                ClaimReceived,
+                NoticeDays,
+                ClaimDays,
+                ContractType,
+                ClaimType,
+                ClaimFiledAmount,
+                ClaimStatus,
+                Reversible,
+                LumpsumHours,
+                CalculationType,
+                TotalAllowedLaytime,
+                TotalTimeUsed,
+                TotalTimeOnDemurrage,
+                TotalDemurrageCost,
+                CalculatorNotes,
+                CreatedAt,
+                LoadingRate,
+                DischargingRate
+            FROM Cases
+            ORDER BY CPDate DESC
+        """)
+
+        columns = [column[0] for column in cursor.description]
+        rows = cursor.fetchall()
+        cases = [dict(zip(columns, row)) for row in rows]
 
         cursor.close()
         conn.close()
 
         return jsonify(cases), 200
     except Exception as e:
+        print("ERROR in /api/cases:", e)
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/update-case-by-id/<int:case_id>", methods=["POST"])
+def update_case_by_id(case_id):
+    try:
+        data = request.get_json()
+        print(f"Updating CaseID {case_id} using data:", data)
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        allowed_fields = {
+            "DeepBlueRef", "ClientName", "VesselName", "VoyageNumber", "VoyageEndDate", "CPDate",
+            "CPType", "CPForm", "OwnersName", "BrokersName", "CharterersName", "ContractType",
+            "ClaimType", "ClaimFiledAmount", "ClaimStatus", "Layday", "Cancelling", "LoadRate",
+            "DischRate", "DemurrageRate", "InitialClaim", "NoticeReceived", "ClaimReceived",
+            "NoticeDays", "ClaimDays", "Reversible", "LumpsumHours", "CalculationType",
+            "TotalAllowedLaytime", "TotalTimeUsed", "TotalTimeOnDemurrage", "TotalDemurrageCost",
+            "CalculatorNotes", "LoadingRate", "DischargingRate"
+        }
+
+        fields_to_update = [key for key in data if key in allowed_fields]
+        if not fields_to_update:
+            return jsonify({"error": "No valid fields provided"}), 400
+
+        set_clause = ", ".join(f"{field} = ?" for field in fields_to_update)
+        values = [data[field] for field in fields_to_update]
+
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Update case using CaseID
+        sql = f"UPDATE Cases SET {set_clause} WHERE CaseID = ?"
+        cursor.execute(sql, values + [case_id])
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"error": f"No case found with CaseID {case_id}"}), 404
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": f"Case {case_id} updated successfully!"}), 200
+
+    except Exception as e:
+        print("Update by CaseID error:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/delete-case/<int:case_id>", methods=["DELETE"])
+def delete_case(case_id):
+    try:
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Optional: check if the case exists first
+        cursor.execute("SELECT 1 FROM Cases WHERE CaseID = ?", (case_id,))
+        if not cursor.fetchone():
+            return jsonify({"error": f"No case found with CaseID {case_id}"}), 404
+
+        # Delete linked Ports, Events, and Deductions (to maintain integrity)
+        cursor.execute("SELECT PortID FROM Ports WHERE CaseID = ?", (case_id,))
+        port_ids = [row[0] for row in cursor.fetchall()]
+
+        for port_id in port_ids:
+            cursor.execute("DELETE FROM Events WHERE PortID = ?", (port_id,))
+            cursor.execute("DELETE FROM Deductions WHERE PortID = ?", (port_id,))
+        
+        cursor.execute("DELETE FROM Ports WHERE CaseID = ?", (case_id,))
+        cursor.execute("DELETE FROM Cases WHERE CaseID = ?", (case_id,))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": f"Case {case_id} and all linked data deleted successfully."}), 200
+
+    except Exception as e:
+        print("Delete error:", str(e))
         return jsonify({"error": str(e)}), 500
 
 # === NEW CASE EXISTENCE CHECK ROUTE ===
