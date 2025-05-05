@@ -15,31 +15,33 @@
 <!-- Main Content Section -->
 <main id="case-summary-container">
   <h2>Case Management</h2>
-  <div id="case-summary-table">
-    <table id="caseSummaryTable">
+  <div id="case-summary-table" class="table-wrapper">
+    <table id="caseSummaryTable" class="case-table">
       <thead>
-        <tr>
-          <th>Action</th>
-          <th>DeepBlueRef</th>
-          <th>Account</th>
-          <th>Vessel Name</th>
-          <th>C/P Date</th>
-          <th>C/P Type</th>
-          <th>C/P Form</th>
-          <th>Owners Name</th>
-          <th>Brokers Name</th>
-          <th>Layday</th>
-          <th>Cancelling</th>
-          <th>Load Rate</th>
-          <th>Disch Rate</th>
-          <th>Demurrage Rate</th>
-          <th>Initial Claim</th>
-          <th>Notice Received</th>
-          <th>Claim Received</th>
-          <th>Voyage End</th>
-          <th>Notice Days</th>
-          <th>Claim Days</th>
-        </tr>
+        <thead>
+          <tr>
+            <th data-column="action" class="sortable">Action <span class="sort-icon"></span></th>
+            <th data-column="deepblue_ref" class="sortable">DeepBlueRef <span class="sort-icon"></span></th>
+            <th data-column="account" class="sortable">Account <span class="sort-icon"></span></th>
+            <th data-column="vessel_name" class="sortable">Vessel Name <span class="sort-icon"></span></th>
+            <th data-column="cp_date" class="sortable">C/P Date <span class="sort-icon"></span></th>
+            <th data-column="cp_type" class="sortable">C/P Type <span class="sort-icon"></span></th>
+            <th data-column="cp_form" class="sortable">C/P Form <span class="sort-icon"></span></th>
+            <th data-column="owners_name" class="sortable">Owners Name <span class="sort-icon"></span></th>
+            <th data-column="brokers_name" class="sortable">Brokers Name <span class="sort-icon"></span></th>
+            <th data-column="layday" class="sortable">Layday <span class="sort-icon"></span></th>
+            <th data-column="cancelling" class="sortable">Cancelling <span class="sort-icon"></span></th>
+            <th data-column="load_rate" class="sortable">Load Rate <span class="sort-icon"></span></th>
+            <th data-column="disch_rate" class="sortable">Disch Rate <span class="sort-icon"></span></th>
+            <th data-column="demurrage_rate" class="sortable">Demurrage Rate <span class="sort-icon"></span></th>
+            <th data-column="initial_claim" class="sortable">Initial Claim <span class="sort-icon"></span></th>
+            <th data-column="notice_received" class="sortable">Notice Received <span class="sort-icon"></span></th>
+            <th data-column="claim_received" class="sortable">Claim Received <span class="sort-icon"></span></th>
+            <th data-column="voyage_end" class="sortable">Voyage End <span class="sort-icon"></span></th>
+            <th data-column="notice_days" class="sortable">Notice Days <span class="sort-icon"></span></th>
+            <th data-column="claim_days" class="sortable">Claim Days <span class="sort-icon"></span></th>
+          </tr>
+        </thead>
       </thead>
       <tbody>
         <!-- Data will be dynamically populated here -->

@@ -1,136 +1,205 @@
 /* General Page Styling */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.5;
-  }
-  
-  h1 {
-    text-align: center;
-    color: #004080;
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  /* Table Styling */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.5;
+}
+
+h1 {
+  text-align: center;
+  color: #004080;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Scrollable Table Container */
+.table-container,
+#case-summary-table {
+  max-height: 600px;
+  overflow: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* Table Styling */
+table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  background-color: #fff;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background-color: #004080;
+  color: #fff;
+  font-weight: bold;
+  text-align: left;
+  padding: 10px 28px 10px 10px; /* space on right for icon */
+  border: 1px solid #ddd;
+  z-index: 2;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+}
+
+thead th:hover {
+  background-color: #0051a3;
+}
+
+/* Default (unsorted): downward chevron */
+thead th::after {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  content: "⌄";
+  font-size: 13px;
+  color: #ccc;
+}
+
+/* Sorted descending: down arrow */
+thead th.sorted-desc::after {
+  content: "↓";
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Sorted ascending: up arrow */
+thead th.sorted-asc::after {
+  content: "↑";
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Cell Styling */
+tbody td {
+  padding: 5px;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tbody tr:hover {
+  background-color: #e9f4ff;
+}
+
+tfoot td {
+  font-weight: bold;
+  background-color: #004080;
+  color: white;
+  padding: 10px;
+  text-align: left;
+}
+
+table th,
+table td {
+  min-width: 120px;
+  max-width: 240px;
+}
+
+/* Column Specific Width Suggestions */
+#caseSummaryTable th:nth-child(1),
+#caseSummaryTable td:nth-child(1) {
+  min-width: 100px;
+}
+
+#caseSummaryTable th:nth-child(2),
+#caseSummaryTable td:nth-child(2) {
+  min-width: 130px;
+}
+
+#caseSummaryTable th:nth-child(4),
+#caseSummaryTable td:nth-child(4) {
+  min-width: 160px;
+}
+
+#caseSummaryTable th:nth-child(5),
+#caseSummaryTable th:nth-child(6),
+#caseSummaryTable th:nth-child(7),
+#caseSummaryTable th:nth-child(8),
+#caseSummaryTable th:nth-child(9),
+#caseSummaryTable th:nth-child(10),
+#caseSummaryTable td:nth-child(5),
+#caseSummaryTable td:nth-child(6),
+#caseSummaryTable td:nth-child(7),
+#caseSummaryTable td:nth-child(8),
+#caseSummaryTable td:nth-child(9),
+#caseSummaryTable td:nth-child(10) {
+  min-width: 110px;
+}
+
+/* Responsive Table Adjustments */
+@media (max-width: 768px) {
   table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #fff;
-  }
-  
-  thead th {
-    background-color: #004080;
-    color: #fff;
-    font-weight: bold;
-    text-align: left;
-    padding: 10px;
-    border: 1px solid #ddd;
-  }
-  
-  tbody td {
-    padding: 5px; /* Reduced padding */
-    border: 1px solid #ddd;
-    text-align: center; /* Ensure center alignment for all cells */
-    vertical-align: middle; /* Align content vertically */
-  }
-  
-  tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  tbody tr:hover {
-    background-color: #e9f4ff;
-  }
-  
-  tfoot td {
-    font-weight: bold;
-    background-color: #004080;
-    color: white;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    table {
-        font-size: 14px;
-    }
-  
-    thead th,
-    tbody td {
-        padding: 5px;
-    }
-  }
-  
-  /* Scrollable Table for Large Data Sets */
-  .table-container {
-    max-height: 600px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  table th, table td {
-    min-width: 120px; /* Ensures columns have a minimum width */
-  }
-  
-  /* Button Styling */
-  /* Force button styling for all browsers */
-  table button.open-calculation-btn {
-    background-color: #004080;
-    color: white;
-    border: none;
-    padding: 5px 10px; /* Adjust padding for better fit */
-    margin: 0;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px; /* Reduced font size for better fit */
-    width: 120px; /* Explicit width */
-    height: 35px; /* Explicit height */
-    text-align: center;
-    line-height: normal; /* Prevent text stretching */
-    display: inline-block;
-    box-sizing: border-box; /* Ensures padding and border are included in width/height */
-  }
-  
-  /* Hover effect */
-  table button.open-calculation-btn:hover {
-    background-color: #003060;
-  }
-  
-  /* Active effect */
-  table button.open-calculation-btn:active {
-    background-color: #002040;
-  }
-  
-  /* For Safari-specific adjustments */
-  @media not all and (min-resolution:.001dpcm) { 
-    @supports (-webkit-appearance:none) {
-        table button.open-calculation-btn {
-            font-size: 11px; /* Slightly smaller font for Safari */
-            height: 30px; /* Adjust height for Safari */
-        }
-    }
-  }
-  
-  /* Ensure Table Columns Adapt */
-  td:first-child {
-    text-align: center;
-    vertical-align: middle; /* Align the button properly */
+    font-size: 14px;
   }
 
-  /* Modal container */
+  thead th,
+  tbody td {
+    padding: 5px;
+  }
+}
+
+/* Button Styling */
+table button.open-calculation-btn {
+  background-color: #004080;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  width: 120px;
+  height: 35px;
+  text-align: center;
+  line-height: normal;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+table button.open-calculation-btn:hover {
+  background-color: #003060;
+}
+
+table button.open-calculation-btn:active {
+  background-color: #002040;
+}
+
+/* Safari fix */
+@media not all and (min-resolution:.001dpcm) {
+  @supports (-webkit-appearance:none) {
+    table button.open-calculation-btn {
+      font-size: 11px;
+      height: 30px;
+    }
+  }
+}
+
+td:first-child {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Modal Styles */
 .modal {
   display: none;
   position: fixed;
@@ -139,11 +208,10 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  overflow-y: auto;  /* Enable vertical scrolling */
+  overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-/* Modal content */
 .modal-content {
   background-color: #fff;
   margin: 40px auto;
@@ -153,17 +221,15 @@ body {
   max-width: 700px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   max-height: 90vh;
-  overflow-y: auto; /* Allow scrolling inside modal */
+  overflow-y: auto;
   font-family: 'Helvetica Neue', sans-serif;
 }
 
-/* Form inside modal */
 .modal-content form {
   display: flex;
   flex-direction: column;
 }
 
-/* Labels and inputs */
 .modal-content label {
   margin-top: 12px;
   margin-bottom: 4px;
@@ -186,7 +252,6 @@ body {
   resize: vertical;
 }
 
-/* Close button */
 .modal-content .close {
   float: right;
   font-size: 24px;
@@ -194,7 +259,6 @@ body {
   color: #444;
 }
 
-/* Save button */
 .modal-content button[type="submit"] {
   margin-top: 20px;
   padding: 10px;
