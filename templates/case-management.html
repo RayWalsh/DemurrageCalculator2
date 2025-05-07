@@ -1,168 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Case Management</title>
 
-  <!-- Updated to use Flask static url_for -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='case-management.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   {% include '_header.html' %}
 
-<!-- Main Content Section -->
-<main id="case-summary-container">
-  <h2>Case Management</h2>
-  <div id="case-summary-table" class="table-wrapper">
-    <table id="caseSummaryTable" class="case-table">
-      <thead>
+  <main id="case-summary-container">
+    <div class="heading-row">
+      <h2>Case Management</h2>
+      <button id="manageColumnsBtn" class="cog-button" title="Select Columns">
+        <i class="fas fa-cog"></i>
+      </button>
+    </div>
+
+    <div id="case-summary-table" class="table-wrapper">
+      <table id="caseSummaryTable" class="case-table">
         <thead>
-          <tr>
-            <th data-column="action" class="sortable">Action <span class="sort-icon"></span></th>
-            <th data-column="deepblue_ref" class="sortable">DeepBlueRef <span class="sort-icon"></span></th>
-            <th data-column="account" class="sortable">Account <span class="sort-icon"></span></th>
-            <th data-column="vessel_name" class="sortable">Vessel Name <span class="sort-icon"></span></th>
-            <th data-column="cp_date" class="sortable">C/P Date <span class="sort-icon"></span></th>
-            <th data-column="cp_type" class="sortable">C/P Type <span class="sort-icon"></span></th>
-            <th data-column="cp_form" class="sortable">C/P Form <span class="sort-icon"></span></th>
-            <th data-column="owners_name" class="sortable">Owners Name <span class="sort-icon"></span></th>
-            <th data-column="brokers_name" class="sortable">Brokers Name <span class="sort-icon"></span></th>
-            <th data-column="layday" class="sortable">Layday <span class="sort-icon"></span></th>
-            <th data-column="cancelling" class="sortable">Cancelling <span class="sort-icon"></span></th>
-            <th data-column="load_rate" class="sortable">Load Rate <span class="sort-icon"></span></th>
-            <th data-column="disch_rate" class="sortable">Disch Rate <span class="sort-icon"></span></th>
-            <th data-column="demurrage_rate" class="sortable">Demurrage Rate <span class="sort-icon"></span></th>
-            <th data-column="initial_claim" class="sortable">Initial Claim <span class="sort-icon"></span></th>
-            <th data-column="notice_received" class="sortable">Notice Received <span class="sort-icon"></span></th>
-            <th data-column="claim_received" class="sortable">Claim Received <span class="sort-icon"></span></th>
-            <th data-column="voyage_end" class="sortable">Voyage End <span class="sort-icon"></span></th>
-            <th data-column="notice_days" class="sortable">Notice Days <span class="sort-icon"></span></th>
-            <th data-column="claim_days" class="sortable">Claim Days <span class="sort-icon"></span></th>
-          </tr>
+          <tr id="tableHeaderRow"></tr> <!-- Dynamically populated -->
         </thead>
-      </thead>
-      <tbody>
-        <!-- Data will be dynamically populated here -->
-      </tbody>
-    </table>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Edit Case Modal -->
+  <div id="editCaseModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeEditModal">&times;</span>
+      <h2>Edit Case</h2>
+      <form id="edit-case-form">
+        <input type="hidden" id="editCaseID" />
+        <label for="editRef">Deep Blue Ref:</label><input type="text" id="editRef" />
+        <label for="editAccount">Account:</label><input type="text" id="editAccount" />
+        <label for="editVesselName">Vessel Name:</label><input type="text" id="editVesselName" />
+        <label for="editVoyageNumber">Voyage Number:</label><input type="text" id="editVoyageNumber" />
+        <label for="editVoyageEndDate">Voyage End Date:</label><input type="date" id="editVoyageEndDate" />
+        <label for="editCPDate">C/P Date:</label><input type="date" id="editCPDate" />
+        <label for="editCPType">C/P Type:</label><input type="text" id="editCPType" />
+        <label for="editCPForm">C/P Form:</label><input type="text" id="editCPForm" />
+        <label for="editOwnersName">Owners Name:</label><input type="text" id="editOwnersName" />
+        <label for="editBrokersName">Brokers Name:</label><input type="text" id="editBrokersName" />
+        <label for="editCharterersName">Charterers Name:</label><input type="text" id="editCharterersName" />
+        <label for="editLayday">Layday:</label><input type="date" id="editLayday" />
+        <label for="editCancelling">Cancelling:</label><input type="date" id="editCancelling" />
+        <label for="editLoadRate">Load Rate (MTPH):</label><input type="number" id="editLoadRate" />
+        <label for="editDischRate">Disch Rate (MTPH):</label><input type="number" id="editDischRate" />
+        <label for="editDemurrageRate">Demurrage Rate (USD/day):</label><input type="number" id="editDemurrageRate" />
+        <label for="editInitialClaim">Initial Claim (USD):</label><input type="number" id="editInitialClaim" />
+        <label for="editNoticeReceived">Notice Received:</label><input type="date" id="editNoticeReceived" />
+        <label for="editNoticeDays">Notice Days:</label><input type="number" id="editNoticeDays" />
+        <label for="editClaimReceived">Claim Received:</label><input type="date" id="editClaimReceived" />
+        <label for="editClaimDays">Claim Days:</label><input type="number" id="editClaimDays" />
+        <label for="editContractType">Contract Type:</label><input type="text" id="editContractType" />
+        <label for="editClaimType">Claim Type:</label><input type="text" id="editClaimType" />
+        <label for="editClaimFiledAmount">Claim Filed Amount (USD):</label><input type="number" id="editClaimFiledAmount" />
+        <label for="editClaimStatus">Claim Status:</label><input type="text" id="editClaimStatus" />
+        <label for="editReversible">Reversible (0/1):</label><input type="number" id="editReversible" min="0" max="1" />
+        <label for="editLumpsumHours">Lumpsum Hours:</label><input type="number" id="editLumpsumHours" step="0.01" />
+        <label for="editCalculationType">Calculation Type:</label><input type="text" id="editCalculationType" />
+        <label for="editTotalAllowedLaytime">Total Allowed Laytime:</label><input type="number" id="editTotalAllowedLaytime" step="0.01" />
+        <label for="editTotalTimeUsed">Total Time Used:</label><input type="number" id="editTotalTimeUsed" step="0.01" />
+        <label for="editTotalTimeOnDemurrage">Time on Demurrage:</label><input type="number" id="editTotalTimeOnDemurrage" step="0.01" />
+        <label for="editTotalDemurrageCost">Total Demurrage Cost (USD):</label><input type="number" id="editTotalDemurrageCost" step="0.01" />
+        <label for="editCalculatorNotes">Calculator Notes:</label><textarea id="editCalculatorNotes" rows="3"></textarea>
+        <button type="submit">Save Changes</button>
+        <button type="button" id="deleteCaseBtn" class="danger-btn">Delete Case</button>
+      </form>
+    </div>
   </div>
-</main>
-<!-- Edit Case Modal -->
-<div id="editCaseModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="closeEditModal">&times;</span>
-    <h2>Edit Case</h2>
-    <form id="edit-case-form">
 
-      <input type="hidden" id="editCaseID" />
-
-      <label for="editRef">Deep Blue Ref:</label>
-      <input type="text" id="editRef">
-
-      <label for="editAccount">Account:</label>
-      <input type="text" id="editAccount">
-
-      <label for="editVesselName">Vessel Name:</label>
-      <input type="text" id="editVesselName">
-
-      <label for="editVoyageNumber">Voyage Number:</label>
-      <input type="text" id="editVoyageNumber">
-
-      <label for="editVoyageEndDate">Voyage End Date:</label>
-      <input type="date" id="editVoyageEndDate">
-
-      <label for="editCPDate">C/P Date:</label>
-      <input type="date" id="editCPDate">
-
-      <label for="editCPType">C/P Type:</label>
-      <input type="text" id="editCPType">
-
-      <label for="editCPForm">C/P Form:</label>
-      <input type="text" id="editCPForm">
-
-      <label for="editOwnersName">Owners Name:</label>
-      <input type="text" id="editOwnersName">
-
-      <label for="editBrokersName">Brokers Name:</label>
-      <input type="text" id="editBrokersName">
-
-      <label for="editCharterersName">Charterers Name:</label>
-      <input type="text" id="editCharterersName">
-
-      <label for="editLayday">Layday:</label>
-      <input type="date" id="editLayday">
-
-      <label for="editCancelling">Cancelling:</label>
-      <input type="date" id="editCancelling">
-
-      <label for="editLoadRate">Load Rate (MTPH):</label>
-      <input type="number" id="editLoadRate">
-
-      <label for="editDischRate">Disch Rate (MTPH):</label>
-      <input type="number" id="editDischRate">
-
-      <label for="editDemurrageRate">Demurrage Rate (USD/day):</label>
-      <input type="number" id="editDemurrageRate">
-
-      <label for="editInitialClaim">Initial Claim (USD):</label>
-      <input type="number" id="editInitialClaim">
-
-      <label for="editNoticeReceived">Notice Received Date:</label>
-      <input type="date" id="editNoticeReceived">
-
-      <label for="editNoticeDays">Notice Days:</label>
-      <input type="number" id="editNoticeDays">
-
-      <label for="editClaimReceived">Claim Received Date:</label>
-      <input type="date" id="editClaimReceived">
-
-      <label for="editClaimDays">Claim Days:</label>
-      <input type="number" id="editClaimDays">
-
-      <label for="editContractType">Contract Type:</label>
-      <input type="text" id="editContractType">
-
-      <label for="editClaimType">Claim Type:</label>
-      <input type="text" id="editClaimType">
-
-      <label for="editClaimFiledAmount">Claim Filed Amount (USD):</label>
-      <input type="number" id="editClaimFiledAmount">
-
-      <label for="editClaimStatus">Claim Status:</label>
-      <input type="text" id="editClaimStatus">
-
-      <label for="editReversible">Reversible (0/1):</label>
-      <input type="number" min="0" max="1" id="editReversible">
-
-      <label for="editLumpsumHours">Lumpsum Hours:</label>
-      <input type="number" step="0.01" id="editLumpsumHours">
-
-      <label for="editCalculationType">Calculation Type:</label>
-      <input type="text" id="editCalculationType">
-
-      <label for="editTotalAllowedLaytime">Total Allowed Laytime:</label>
-      <input type="number" step="0.01" id="editTotalAllowedLaytime">
-
-      <label for="editTotalTimeUsed">Total Time Used:</label>
-      <input type="number" step="0.01" id="editTotalTimeUsed">
-
-      <label for="editTotalTimeOnDemurrage">Time on Demurrage:</label>
-      <input type="number" step="0.01" id="editTotalTimeOnDemurrage">
-
-      <label for="editTotalDemurrageCost">Total Demurrage Cost (USD):</label>
-      <input type="number" step="0.01" id="editTotalDemurrageCost">
-
-      <label for="editCalculatorNotes">Calculator Notes:</label>
-      <textarea id="editCalculatorNotes" rows="3"></textarea>
-
-      <button type="submit">Save Changes</button>
-      <button type="button" id="deleteCaseBtn" class="danger-btn">Delete Case</button>
-    </form>
+  <!-- Column Picker Panel -->
+  <div id="columnPickerPanel" class="side-panel">
+    <div class="side-panel-header">
+      <h3>Edit View Columns</h3>
+      <button id="closeColumnPicker" class="close-panel">&times;</button>
+    </div>
+    <div class="side-panel-body">
+      <ul id="columnToggleList" class="column-toggle-list"></ul>
+    </div>
+    <div class="side-panel-footer">
+      <button id="applyColumnPrefs">Apply</button>
+      <button id="cancelColumnPrefs">Cancel</button>
+    </div>
   </div>
-</div>
-<!-- Link to your Case Management JavaScript -->
-<script src="{{ url_for('static', filename='modules/CaseManagement.js') }}"></script>
+
+  <!-- JS -->
+  <script src="{{ url_for('static', filename='modules/CaseManagement.js') }}"></script>
 </body>
 </html>

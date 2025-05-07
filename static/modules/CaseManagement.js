@@ -1,148 +1,119 @@
 document.addEventListener("DOMContentLoaded", () => {
   const table = document.getElementById("caseSummaryTable");
   const tableBody = table.querySelector("tbody");
+  const headerRow = document.getElementById("tableHeaderRow");
+
   const modal = document.getElementById("editCaseModal");
   const closeModalBtn = document.getElementById("closeEditModal");
   const form = document.getElementById("edit-case-form");
 
+  const manageColumnsBtn = document.getElementById("manageColumnsBtn");
+  const columnPickerPanel = document.getElementById("columnPickerPanel");
+  const closeColumnPicker = document.getElementById("closeColumnPicker");
+  const columnList = document.getElementById("columnToggleList");
+  const applyColumnPrefsBtn = document.getElementById("applyColumnPrefs");
+  const cancelColumnPrefsBtn = document.getElementById("cancelColumnPrefs");
+
   const fieldMap = {
-    editRef: "DeepBlueRef",
-    editAccount: "ClientName",
-    editVesselName: "VesselName",
-    editVoyageNumber: "VoyageNumber",
-    editVoyageEndDate: "VoyageEndDate",
-    editCPDate: "CPDate",
-    editCPType: "CPType",
-    editCPForm: "CPForm",
-    editOwnersName: "OwnersName",
-    editBrokersName: "BrokersName",
-    editCharterersName: "CharterersName",
-    editLayday: "Layday",
-    editCancelling: "Cancelling",
-    editLoadRate: "LoadRate",
-    editDischRate: "DischRate",
-    editDemurrageRate: "DemurrageRate",
-    editInitialClaim: "InitialClaim",
-    editNoticeReceived: "NoticeReceived",
-    editNoticeDays: "NoticeDays",
-    editClaimReceived: "ClaimReceived",
-    editClaimDays: "ClaimDays",
-    editContractType: "ContractType",
-    editClaimType: "ClaimType",
-    editClaimFiledAmount: "ClaimFiledAmount",
-    editClaimStatus: "ClaimStatus",
-    editReversible: "Reversible",
-    editLumpsumHours: "LumpsumHours",
-    editCalculationType: "CalculationType",
-    editTotalAllowedLaytime: "TotalAllowedLaytime",
-    editTotalTimeUsed: "TotalTimeUsed",
-    editTotalTimeOnDemurrage: "TotalTimeOnDemurrage",
-    editTotalDemurrageCost: "TotalDemurrageCost",
-    editCalculatorNotes: "CalculatorNotes"
+    editRef: "DeepBlueRef", editAccount: "ClientName", editVesselName: "VesselName",
+    editVoyageNumber: "VoyageNumber", editVoyageEndDate: "VoyageEndDate", editCPDate: "CPDate",
+    editCPType: "CPType", editCPForm: "CPForm", editOwnersName: "OwnersName",
+    editBrokersName: "BrokersName", editCharterersName: "CharterersName", editLayday: "Layday",
+    editCancelling: "Cancelling", editLoadRate: "LoadRate", editDischRate: "DischRate",
+    editDemurrageRate: "DemurrageRate", editInitialClaim: "InitialClaim", editNoticeReceived: "NoticeReceived",
+    editNoticeDays: "NoticeDays", editClaimReceived: "ClaimReceived", editClaimDays: "ClaimDays",
+    editContractType: "ContractType", editClaimType: "ClaimType", editClaimFiledAmount: "ClaimFiledAmount",
+    editClaimStatus: "ClaimStatus", editReversible: "Reversible", editLumpsumHours: "LumpsumHours",
+    editCalculationType: "CalculationType", editTotalAllowedLaytime: "TotalAllowedLaytime",
+    editTotalTimeUsed: "TotalTimeUsed", editTotalTimeOnDemurrage: "TotalTimeOnDemurrage",
+    editTotalDemurrageCost: "TotalDemurrageCost", editCalculatorNotes: "CalculatorNotes"
   };
 
-  let allRecords = []; // Original data
-  let currentSort = { index: null, direction: null };
+  const defaultColumns = [
+    { key: "Action", label: "Action", visible: true },
+    { key: "DeepBlueRef", label: "DeepBlueRef", visible: true },
+    { key: "ClientName", label: "Account", visible: true },
+    { key: "VesselName", label: "Vessel Name", visible: true },
+    { key: "CPDate", label: "C/P Date", visible: true },
+    { key: "CPType", label: "C/P Type", visible: true },
+    { key: "CPForm", label: "C/P Form", visible: true },
+    { key: "OwnersName", label: "Owners Name", visible: true },
+    { key: "BrokersName", label: "Brokers Name", visible: true },
+    { key: "Layday", label: "Layday", visible: true },
+    { key: "Cancelling", label: "Cancelling", visible: true },
+    { key: "LoadRate", label: "Load Rate", visible: true },
+    { key: "DischRate", label: "Disch Rate", visible: true },
+    { key: "DemurrageRate", label: "Demurrage Rate", visible: true },
+    { key: "ClaimFiledAmount", label: "Initial Claim", visible: true },
+    { key: "NoticeReceived", label: "Notice Received", visible: true },
+    { key: "ClaimReceived", label: "Claim Received", visible: true },
+    { key: "VoyageEndDate", label: "Voyage End", visible: true },
+    { key: "VoyageNumber", label: "Voyage Number", visible: true },
+    { key: "NoticeDays", label: "Notice Days", visible: true },
+    { key: "ClaimDays", label: "Claim Days", visible: true }
+  ];
 
-  const formatDateInput = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return isNaN(date) ? "" : date.toISOString().split("T")[0];
-  };
-
-  const formatFriendlyDate = (dateStr) => {
-    if (!dateStr) return "-";
-    const date = new Date(dateStr);
-    return isNaN(date) ? "-" : date.toLocaleDateString("en-GB", {
-      day: "2-digit", month: "short", year: "numeric"
-    });
-  };
-
-  function openEditModal(record) {
-    modal.style.display = "block";
-    document.getElementById("editCaseID").value = record.CaseID || "";
-
-    for (const [inputId, fieldKey] of Object.entries(fieldMap)) {
-      const input = document.getElementById(inputId);
-      if (!input) continue;
-      input.value = input.type === "date" ? formatDateInput(record[fieldKey]) : record[fieldKey] ?? "";
+  const getColumnPrefs = () => {
+    try {
+      return JSON.parse(localStorage.getItem("columnPrefs")) || [...defaultColumns];
+    } catch {
+      return [...defaultColumns];
     }
+  };
 
-    form.dataset.original = JSON.stringify(record);
-  }
+  const setColumnPrefs = (prefs) => {
+    localStorage.setItem("columnPrefs", JSON.stringify(prefs));
+  };
 
-  closeModalBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-  });
+  function renderHeader() {
+    const prefs = getColumnPrefs().filter(col => col.visible);
+    headerRow.innerHTML = "";
 
-  const deleteBtn = document.getElementById("deleteCaseBtn");
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", async () => {
-      const caseId = document.getElementById("editCaseID").value;
-      if (!caseId) return alert("No CaseID found.");
-      if (!confirm("Are you sure you want to delete this case?")) return;
-
-      try {
-        const res = await fetch(`/api/delete-case/${caseId}`, { method: "DELETE" });
-        const result = await res.json();
-        if (res.ok) {
-          alert("Case deleted successfully.");
-          modal.style.display = "none";
-          location.reload();
-        } else {
-          alert("Error deleting case: " + (result.error || "Unknown error"));
-        }
-      } catch (err) {
-        console.error("API error during delete:", err);
-        alert("Failed to delete case.");
-      }
+    prefs.forEach(col => {
+      const th = document.createElement("th");
+      th.textContent = col.label;
+      headerRow.appendChild(th);
     });
   }
 
   function renderTable(records) {
+    const prefs = getColumnPrefs().filter(col => col.visible);
     tableBody.innerHTML = "";
+
     records.forEach(record => {
       const row = document.createElement("tr");
 
-      const actionCell = document.createElement("td");
-      const openBtn = document.createElement("button");
-      openBtn.textContent = "Open Calculation";
-      openBtn.classList.add("open-calculation-btn");
-      openBtn.dataset.caseId = record.CaseID;
-      openBtn.addEventListener("click", () => {
-        localStorage.setItem("currentCaseRef", record.DeepBlueRef);
-        localStorage.setItem("currentCaseID", record.CaseID);
-        window.location.href = "/calculator";
-      });
-      actionCell.appendChild(openBtn);
-      row.appendChild(actionCell);
-
-      const fields = [
-        "DeepBlueRef", "ClientName", "VesselName", "CPDate", "CPType", "CPForm", "OwnersName",
-        "BrokersName", "Layday", "Cancelling", "LoadRate", "DischRate", "DemurrageRate",
-        "ClaimFiledAmount", "NoticeReceived", "ClaimReceived", "VoyageEndDate",
-        "VoyageNumber", "NoticeDays", "ClaimDays"
-      ];
-
-      fields.forEach(field => {
+      prefs.forEach(col => {
         const cell = document.createElement("td");
-        let value = record[field];
 
-        if (["CPDate", "VoyageEndDate", "Layday", "Cancelling", "NoticeReceived", "ClaimReceived"].includes(field)) {
-          value = formatFriendlyDate(value);
-        }
-
-        if (field === "VesselName") {
-          const link = document.createElement("a");
-          link.href = "#";
-          link.textContent = value || "-";
-          link.addEventListener("click", (e) => {
-            e.preventDefault();
-            openEditModal(record);
+        if (col.key === "Action") {
+          const btn = document.createElement("button");
+          btn.textContent = "Open Calculation";
+          btn.className = "open-calculation-btn";
+          btn.addEventListener("click", () => {
+            localStorage.setItem("currentCaseRef", record.DeepBlueRef);
+            localStorage.setItem("currentCaseID", record.CaseID);
+            window.location.href = "/calculator";
           });
-          cell.appendChild(link);
+          cell.appendChild(btn);
         } else {
-          cell.textContent = value ?? "-";
+          let value = record[col.key];
+          if (["CPDate", "VoyageEndDate", "Layday", "Cancelling", "NoticeReceived", "ClaimReceived"].includes(col.key)) {
+            value = formatFriendlyDate(value);
+          }
+
+          if (col.key === "VesselName") {
+            const link = document.createElement("a");
+            link.href = "#";
+            link.textContent = value || "-";
+            link.addEventListener("click", (e) => {
+              e.preventDefault();
+              openEditModal(record);
+            });
+            cell.appendChild(link);
+          } else {
+            cell.textContent = value ?? "-";
+          }
         }
 
         row.appendChild(cell);
@@ -152,65 +123,102 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function parseValue(val) {
-    const date = Date.parse(val);
-    if (!isNaN(date)) return date;
-    const num = parseFloat(val.replace(/[^0-9.\-]/g, ""));
-    return isNaN(num) ? val.toLowerCase() : num;
-  }
-
-  function sortTableByColumn(index) {
-    const ths = table.querySelectorAll("thead th");
-    const isSame = currentSort.index === index;
-    const nextDirection = isSame
-      ? currentSort.direction === "asc" ? "desc" : currentSort.direction === "desc" ? null : "asc"
-      : "asc";
-
-    currentSort = { index: nextDirection ? index : null, direction: nextDirection };
-
-    ths.forEach(th => th.classList.remove("sorted-asc", "sorted-desc"));
-    if (nextDirection) {
-      ths[index].classList.add(`sorted-${nextDirection}`);
-    }
-
-    if (!nextDirection) {
-      renderTable(allRecords);
-      return;
-    }
-
-    const sorted = [...tableBody.rows].sort((a, b) => {
-      const valA = a.cells[index]?.textContent.trim();
-      const valB = b.cells[index]?.textContent.trim();
-      const aParsed = parseValue(valA);
-      const bParsed = parseValue(valB);
-      if (aParsed < bParsed) return nextDirection === "asc" ? -1 : 1;
-      if (aParsed > bParsed) return nextDirection === "asc" ? 1 : -1;
-      return 0;
+  function formatFriendlyDate(dateStr) {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr);
+    return isNaN(date) ? "-" : date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
     });
-
-    tableBody.innerHTML = "";
-    sorted.forEach(row => tableBody.appendChild(row));
   }
 
-  table.querySelectorAll("thead th").forEach((th, index) => {
-    th.style.cursor = "pointer";
-    th.addEventListener("click", () => sortTableByColumn(index));
-  });
+  function openEditModal(record) {
+    modal.style.display = "block";
+    document.getElementById("editCaseID").value = record.CaseID || "";
+    for (const [inputId, fieldKey] of Object.entries(fieldMap)) {
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.value = input.type === "date" ? formatFriendlyDate(record[fieldKey]) : record[fieldKey] ?? "";
+      }
+    }
+    form.dataset.original = JSON.stringify(record);
+  }
 
-  // Fetch and render table
+  // Column Picker Events
+  if (manageColumnsBtn) {
+    manageColumnsBtn.addEventListener("click", () => {
+      renderColumnPicker();
+      columnPickerPanel.classList.add("show");
+    });
+  }
+
+  if (closeColumnPicker || cancelColumnPrefsBtn) {
+    [closeColumnPicker, cancelColumnPrefsBtn].forEach(btn => {
+      if (btn) btn.addEventListener("click", () => {
+        columnPickerPanel.classList.remove("show");
+      });
+    });
+  }
+
+  if (applyColumnPrefsBtn) {
+    applyColumnPrefsBtn.addEventListener("click", () => {
+      const updatedPrefs = Array.from(columnList.children).map(li => {
+        const checkbox = li.querySelector("input[type='checkbox']");
+        const label = li.querySelector("label");
+        return {
+          key: defaultColumns.find(col => col.label === label.textContent).key,
+          label: label.textContent,
+          visible: checkbox.checked
+        };
+      });
+      setColumnPrefs(updatedPrefs);
+      columnPickerPanel.classList.remove("show");
+      renderHeader();
+      renderTable(allRecords);
+    });
+  }
+
+  function renderColumnPicker() {
+    const prefs = getColumnPrefs();
+    columnList.innerHTML = "";
+
+    prefs.forEach((col, i) => {
+      const li = document.createElement("li");
+      li.className = "column-item";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = col.visible;
+      checkbox.id = `col-${i}`;
+
+      const label = document.createElement("label");
+      label.setAttribute("for", `col-${i}`);
+      label.textContent = col.label;
+
+      li.appendChild(checkbox);
+      li.appendChild(label);
+      columnList.appendChild(li);
+    });
+  }
+
+  // Initial fetch
+  let allRecords = [];
+
   fetch("/api/cases")
     .then(res => res.json())
-    .then(cases => {
-      allRecords = cases;
+    .then(data => {
+      allRecords = data;
+      renderHeader();
       renderTable(allRecords);
     })
     .catch(err => {
-      console.error("Failed to load case data:", err);
-      const row = document.createElement("tr");
-      const cell = document.createElement("td");
-      cell.colSpan = 20;
-      cell.textContent = "Error loading data.";
-      row.appendChild(cell);
-      tableBody.appendChild(row);
+      console.error("Failed to load cases:", err);
     });
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+  }
 });
