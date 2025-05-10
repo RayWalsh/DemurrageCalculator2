@@ -35,6 +35,9 @@
     <div class="modal-content">
       <span class="close" id="closeEditModal">&times;</span>
       <h2>Edit Case</h2>
+      <div style="margin-bottom: 10px;">
+        <button id="modalOpenCalculationBtn" type="button" class="primary-btn">Open Calculation</button>
+      </div>
       <form id="edit-case-form">
         <input type="hidden" id="editCaseID" />
         <label for="editRef">Deep Blue Ref:</label><input type="text" id="editRef" />
@@ -84,11 +87,15 @@
     </div>
     <div class="side-panel-body">
       <ul id="columnToggleList" class="column-toggle-list"></ul>
+    <div class="button-row reset-row">
+      <button id="resetColumnPrefs" class="danger-btn">Reset View</button>
+    </div>
     </div>
     <div class="side-panel-footer">
       <button id="applyColumnPrefs">Apply</button>
       <button id="cancelColumnPrefs">Cancel</button>
     </div>
+
   </div>
 
   <!-- JS -->

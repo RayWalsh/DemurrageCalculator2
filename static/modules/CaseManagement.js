@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const defaultColumns = [
-    { key: "Action", label: "Action", visible: true },
     { key: "DeepBlueRef", label: "DeepBlueRef", visible: true },
     { key: "ClientName", label: "Account", visible: true },
     { key: "VesselName", label: "Vessel Name", visible: true },
@@ -86,34 +85,22 @@ document.addEventListener("DOMContentLoaded", () => {
       prefs.forEach(col => {
         const cell = document.createElement("td");
 
-        if (col.key === "Action") {
-          const btn = document.createElement("button");
-          btn.textContent = "Open Calculation";
-          btn.className = "open-calculation-btn";
-          btn.addEventListener("click", () => {
-            localStorage.setItem("currentCaseRef", record.DeepBlueRef);
-            localStorage.setItem("currentCaseID", record.CaseID);
-            window.location.href = "/calculator";
-          });
-          cell.appendChild(btn);
-        } else {
-          let value = record[col.key];
-          if (["CPDate", "VoyageEndDate", "Layday", "Cancelling", "NoticeReceived", "ClaimReceived"].includes(col.key)) {
-            value = formatFriendlyDate(value);
-          }
+        let value = record[col.key];
+        if (["CPDate", "VoyageEndDate", "Layday", "Cancelling", "NoticeReceived", "ClaimReceived"].includes(col.key)) {
+          value = formatFriendlyDate(value);
+        }
 
-          if (col.key === "VesselName") {
-            const link = document.createElement("a");
-            link.href = "#";
-            link.textContent = value || "-";
-            link.addEventListener("click", (e) => {
-              e.preventDefault();
-              openEditModal(record);
-            });
-            cell.appendChild(link);
-          } else {
-            cell.textContent = value ?? "-";
-          }
+        if (col.key === "VesselName") {
+          const link = document.createElement("a");
+          link.href = "#";
+          link.textContent = value || "-";
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            openEditModal(record);
+          });
+          cell.appendChild(link);
+        } else {
+          cell.textContent = value ?? "-";
         }
 
         row.appendChild(cell);
@@ -143,6 +130,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     form.dataset.original = JSON.stringify(record);
+
+    const modalCalcBtn = document.getElementById("modalOpenCalculationBtn");
+    if (modalCalcBtn) {
+      modalCalcBtn.onclick = () => {
+        localStorage.setItem("currentCaseRef", record.DeepBlueRef);
+        localStorage.setItem("currentCaseID", record.CaseID);
+        window.location.href = "/calculator";
+      };
+    }
   }
 
   // Column Picker Events
@@ -178,6 +174,20 @@ document.addEventListener("DOMContentLoaded", () => {
       renderTable(allRecords);
     });
   }
+
+  const resetColumnPrefsBtn = document.getElementById("resetColumnPrefs");
+  if (resetColumnPrefsBtn) {
+    resetColumnPrefsBtn.addEventListener("click", () => {
+      const confirmReset = confirm("Are you sure you want to reset the column view to default?");
+      if (confirmReset) {
+        localStorage.removeItem("columnPrefs");
+        renderHeader();
+        renderTable(allRecords);
+        columnPickerPanel.classList.remove("show");
+      }
+    });
+  }
+
 
   function renderColumnPicker() {
     const prefs = getColumnPrefs();
