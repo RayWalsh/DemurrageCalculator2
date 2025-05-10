@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("edit-case-form");
 
   const manageColumnsBtn = document.getElementById("manageColumnsBtn");
+
+  const exportCSVBtn = document.getElementById("exportCSVBtn");
+  if (exportCSVBtn) {
+    exportCSVBtn.addEventListener("click", () => {
+      downloadCSV(allRecords);
+    });
+  }
+
   const columnPickerPanel = document.getElementById("columnPickerPanel");
   const closeColumnPicker = document.getElementById("closeColumnPicker");
   const columnList = document.getElementById("columnToggleList");
@@ -75,40 +83,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function renderTable(records) {
-    const prefs = getColumnPrefs().filter(col => col.visible);
-    tableBody.innerHTML = "";
+function renderTable(records) {
+  const prefs = getColumnPrefs().filter(col => col.visible);
+  tableBody.innerHTML = "";
 
-    records.forEach(record => {
-      const row = document.createElement("tr");
+  records.forEach(record => {
+    const row = document.createElement("tr");
 
-      prefs.forEach(col => {
-        const cell = document.createElement("td");
+    prefs.forEach(col => {
+      const cell = document.createElement("td");
+      let value = record[col.key];
 
-        let value = record[col.key];
-        if (["CPDate", "VoyageEndDate", "Layday", "Cancelling", "NoticeReceived", "ClaimReceived"].includes(col.key)) {
-          value = formatFriendlyDate(value);
-        }
+      if (["CPDate", "VoyageEndDate", "Layday", "Cancelling", "NoticeReceived", "ClaimReceived"].includes(col.key)) {
+        value = formatFriendlyDate(value);
+      }
 
-        if (col.key === "VesselName") {
-          const link = document.createElement("a");
-          link.href = "#";
-          link.textContent = value || "-";
-          link.addEventListener("click", (e) => {
-            e.preventDefault();
-            openEditModal(record);
-          });
-          cell.appendChild(link);
-        } else {
-          cell.textContent = value ?? "-";
-        }
+      if (col.key === "DeepBlueRef") {
+        const link = document.createElement("a");
+        link.href = "#";
+        link.textContent = value || "-";
+        link.classList.add("clickable-ref");
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          openEditModal(record);
+        });
+        cell.appendChild(link);
+      } else {
+        cell.textContent = value ?? "-";
+      }
 
-        row.appendChild(cell);
-      });
-
-      tableBody.appendChild(row);
+      row.appendChild(cell);
     });
-  }
+
+    tableBody.appendChild(row);
+  });
+}
+
+function filterRecords(records, query) {
+  const lowerQuery = query.toLowerCase();
+  const prefs = getColumnPrefs().filter(col => col.visible);
+  return records.filter(record =>
+    prefs.some(col => {
+      const val = record[col.key];
+      return val && String(val).toLowerCase().includes(lowerQuery);
+    })
+  );
+}
 
   function formatFriendlyDate(dateStr) {
     if (!dateStr) return "-";
@@ -212,6 +232,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+function downloadCSV(data) {
+  const prefs = getColumnPrefs().filter(col => col.visible);
+  const headers = prefs.map(col => col.label);
+  const keys = prefs.map(col => col.key);
+
+  const csvRows = [
+    headers.join(","),
+    ...data.map(row =>
+      keys.map(key => {
+        let value = row[key] ?? "";
+        return `"${String(value).replace(/"/g, '""')}"`;
+      }).join(",")
+    )
+  ];
+
+  const csvContent = csvRows.join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "case_export.csv";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
   // Initial fetch
   let allRecords = [];
 
@@ -225,6 +274,15 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(err => {
       console.error("Failed to load cases:", err);
     });
+
+const globalSearch = document.getElementById("globalSearch");
+if (globalSearch) {
+  globalSearch.addEventListener("input", (e) => {
+    const query = e.target.value;
+    const filtered = filterRecords(allRecords, query);
+    renderTable(filtered);
+  });
+}
 
   if (closeModalBtn) {
     closeModalBtn.addEventListener("click", () => {

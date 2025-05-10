@@ -3,22 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title></title>
+  <title>Deep Blue Shipping Tools</title>
 
   <!-- External CSS & Fonts -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link rel="stylesheet" href="https://use.typekit.net/hks8wxj.css" />
+
+  <style>
+    .changelog {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: #fefefe;
+      border-left: 5px solid #004080;
+      border-radius: 4px;
+    }
+
+    .changelog h3 {
+      color: #004080;
+      margin-top: 0;
+    }
+
+    .changelog-entry h4 {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: #004080;
+    }
+
+    .changelog-entry h5 {
+      font-size: 1rem;
+      margin-top: 1rem;
+      color: #333;
+    }
+
+    .changelog ul {
+      padding-left: 1.2rem;
+    }
+
+    .changelog li {
+      margin-bottom: 0.4rem;
+    }
+  </style>
 </head>
 <body>
   {% include '_header.html' %}
 
-  <!-- Main Application Container -->
   <main id="app-container">
     <section>
       <h2>Welcome to Deep Blue Shipping Tools</h2>
       <p>Select a tool from the navigation bar above to get started.</p>
     </section>
-  </main>
 
+    <section class="changelog">
+      <h3>Changelog</h3>
+
+      <article class="changelog-entry">
+        <h4>v1.3 – May 2025</h4>
+        <ul>
+          <li><strong>Export to CSV:</strong> Users can now download the visible case table as a CSV file from the Case Management page.</li>
+          <li><strong>Global Search Bar:</strong> A new top-right search input allows users to filter all visible table rows across all columns in real time.</li>
+          <li><strong>Column Picker (Field Selector):</strong> Users can show or hide columns using the cog icon, and their preferences are saved.</li>
+          <li><strong>Column Sorting:</strong> Users can sort the case table by clicking any column header (toggle between ascending and descending).</li>
+        </ul>
+
+        <h5>Changed</h5>
+        <ul>
+          <li><strong>Interface Simplification:</strong> Removed row-based action buttons from the table; all case actions are now handled through the Edit Case modal (accessed by clicking DeepBlueRef).</li>
+        </ul>
+      </article>
+
+      <article class="changelog-entry">
+        <h4>v1.2 – April 2025</h4>
+        <ul>
+          <li><strong>Clickable DeepBlueRef:</strong> Clicking the case ID opens the Edit Case modal.</li>
+          <li><strong>Saved Column Preferences:</strong> User-selected column visibility is now saved across sessions using localStorage.</li>
+          <li><strong>Reset View Button:</strong> Users can reset their column layout to the default via the column picker panel.</li>
+        </ul>
+
+        <h5>Changed</h5>
+        <ul>
+          <li><strong>Removed VesselName Click:</strong> Only DeepBlueRef is now used for opening the Edit Case modal.</li>
+          <li><strong>Visual Cleanup:</strong> Header buttons aligned for better layout; minor spacing and hover adjustments.</li>
+        </ul>
+      </article>
+
+      <article class="changelog-entry">
+        <h4>v1.1 – March 2025</h4>
+        <p><em>Initial deployment of the Case Management interface and modal editor.</em></p>
+      </article>
+    </section>
+  </main>
 </body>
 </html>

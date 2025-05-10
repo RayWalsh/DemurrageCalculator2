@@ -307,6 +307,13 @@ td:first-child {
   margin: 0;
 }
 
+.heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-button,
 .cog-button {
   background: none;
   border: none;
@@ -404,4 +411,51 @@ td:first-child {
 #cancelColumnPrefs {
   background-color: #ccc;
   color: #000;
+}
+
+.clickable-ref {
+  font-weight: bold;
+  text-decoration: underline;
+  color: inherit;
+}
+
+.clickable-ref:visited {
+  color: inherit;
+}
+
+
+ 
+
+.export-button i {
+  color: #217346;
+}
+
+.search-container {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#globalSearch {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.heading-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.heading-controls input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-width: 200px;
 }

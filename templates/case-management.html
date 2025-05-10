@@ -15,9 +15,15 @@
   <main id="case-summary-container">
     <div class="heading-row">
       <h2>Case Management</h2>
-      <button id="manageColumnsBtn" class="cog-button" title="Select Columns">
-        <i class="fas fa-cog"></i>
-      </button>
+      <div class="heading-controls">
+        <button id="exportCSVBtn" class="export-button" title="Export to CSV">
+          <i class="fas fa-file-csv"></i>
+        </button>
+        <button id="manageColumnsBtn" class="cog-button" title="Select Columns">
+          <i class="fas fa-cog"></i>
+        </button>
+        <input type="text" id="globalSearch" placeholder="Search cases..." title="Filter case rows" />
+      </div>
     </div>
 
     <div id="case-summary-table" class="table-wrapper">
