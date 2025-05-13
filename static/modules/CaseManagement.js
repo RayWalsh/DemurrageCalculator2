@@ -72,16 +72,44 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("columnPrefs", JSON.stringify(prefs));
   };
 
-  function renderHeader() {
-    const prefs = getColumnPrefs().filter(col => col.visible);
-    headerRow.innerHTML = "";
+function renderHeader() {
+  const prefs = getColumnPrefs().filter(col => col.visible);
+  headerRow.innerHTML = "";
 
-    prefs.forEach(col => {
-      const th = document.createElement("th");
-      th.textContent = col.label;
-      headerRow.appendChild(th);
+  prefs.forEach(col => {
+    const th = document.createElement("th");
+    th.textContent = col.label;
+
+    if (col.key === currentSortKey) {
+      th.classList.add(`sorted-${currentSortDirection}`);
+    }
+
+    th.addEventListener("click", () => {
+      if (currentSortKey === col.key) {
+        if (currentSortDirection === "asc") {
+          currentSortDirection = "desc";
+        } else if (currentSortDirection === "desc") {
+          // 3rd click resets sort
+          currentSortKey = null;
+          currentSortDirection = "asc";
+          allRecords = [...originalRecords]; // restore original order
+          renderTable(allRecords);
+          renderHeader();
+          return;
+        }
+      } else {
+        currentSortKey = col.key;
+        currentSortDirection = "asc";
+      }
+
+      sortRecords();
+      renderTable(allRecords);
+      renderHeader();
     });
-  }
+
+    headerRow.appendChild(th);
+  });
+}
 
 function renderTable(records) {
   const prefs = getColumnPrefs().filter(col => col.visible);
@@ -295,13 +323,42 @@ function downloadCSV(data) {
   URL.revokeObjectURL(url);
 }
 
+function sortRecords() {
+  if (!currentSortKey) return;
+
+  allRecords.sort((a, b) => {
+    let valA = a[currentSortKey];
+    let valB = b[currentSortKey];
+
+    // Try to treat values as dates or numbers if possible
+    if (!isNaN(Date.parse(valA)) && !isNaN(Date.parse(valB))) {
+      valA = new Date(valA);
+      valB = new Date(valB);
+    } else if (!isNaN(valA) && !isNaN(valB)) {
+      valA = parseFloat(valA);
+      valB = parseFloat(valB);
+    } else {
+      valA = valA?.toString().toLowerCase() ?? "";
+      valB = valB?.toString().toLowerCase() ?? "";
+    }
+
+    if (valA < valB) return currentSortDirection === "asc" ? -1 : 1;
+    if (valA > valB) return currentSortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+}
+
   // Initial fetch
   let allRecords = [];
+  let originalRecords = []; // this will store the untouched original data
+  let currentSortKey = null;
+  let currentSortDirection = "asc";
 
   fetch("/api/cases")
     .then(res => res.json())
     .then(data => {
       allRecords = data;
+      originalRecords = [...data]; // save the original unmodified order
       renderHeader();
       renderTable(allRecords);
     })
