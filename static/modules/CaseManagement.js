@@ -209,28 +209,62 @@ function filterRecords(records, query) {
   }
 
 
-  function renderColumnPicker() {
-    const prefs = getColumnPrefs();
-    columnList.innerHTML = "";
+function renderColumnPicker() {
+  const prefs = getColumnPrefs();
+  columnList.innerHTML = "";
 
-    prefs.forEach((col, i) => {
-      const li = document.createElement("li");
-      li.className = "column-item";
+  prefs.forEach((col, i) => {
+    const li = document.createElement("li");
+    li.className = "column-item";
 
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = col.visible;
-      checkbox.id = `col-${i}`;
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = col.visible;
+    checkbox.id = `col-${i}`;
 
-      const label = document.createElement("label");
-      label.setAttribute("for", `col-${i}`);
-      label.textContent = col.label;
+    const label = document.createElement("label");
+    label.setAttribute("for", `col-${i}`);
+    label.textContent = col.label;
 
-      li.appendChild(checkbox);
-      li.appendChild(label);
-      columnList.appendChild(li);
-    });
-  }
+    // Chevron controls
+    const controls = document.createElement("div");
+    controls.className = "column-controls";
+
+    const upBtn = document.createElement("button");
+    upBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    upBtn.title = "Move Up";
+    upBtn.disabled = i === 0;
+    upBtn.onclick = () => {
+      if (i > 0) {
+        const newPrefs = [...prefs];
+        [newPrefs[i], newPrefs[i - 1]] = [newPrefs[i - 1], newPrefs[i]];
+        setColumnPrefs(newPrefs);
+        renderColumnPicker(); // Re-render with new order
+      }
+    };
+
+    const downBtn = document.createElement("button");
+    downBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+    downBtn.title = "Move Down";
+    downBtn.disabled = i === prefs.length - 1;
+    downBtn.onclick = () => {
+      if (i < prefs.length - 1) {
+        const newPrefs = [...prefs];
+        [newPrefs[i], newPrefs[i + 1]] = [newPrefs[i + 1], newPrefs[i]];
+        setColumnPrefs(newPrefs);
+        renderColumnPicker(); // Re-render with new order
+      }
+    };
+
+    controls.appendChild(upBtn);
+    controls.appendChild(downBtn);
+
+    li.appendChild(checkbox);
+    li.appendChild(label);
+    li.appendChild(controls);
+    columnList.appendChild(li);
+  });
+}
 
 function downloadCSV(data) {
   const prefs = getColumnPrefs().filter(col => col.visible);

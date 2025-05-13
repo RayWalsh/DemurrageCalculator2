@@ -171,10 +171,12 @@
 
         <form method="post">
             <label for="username">Username</label>
-            <input type="text" name="username" id="username" required>
+            <input type="text" name="username" id="username" required 
+                   autocapitalize="none" autocorrect="off" autocomplete="username">
 
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" required>
+            <input type="password" name="password" id="password" required 
+                   autocapitalize="none" autocorrect="off" autocomplete="current-password">
 
             {% if error %}
             <div class="error">{{ error }}</div>
@@ -197,13 +199,16 @@
         <h3>Reset Your Password</h3>
         <form method="post" action="/forgot-password">
             <label for="reset-username">Username</label>
-            <input type="text" name="username" id="reset-username" required>
+            <input type="text" name="username" id="reset-username" required 
+                   autocapitalize="none" autocorrect="off">
 
             <label for="reset-email">Email</label>
-            <input type="email" name="email" id="reset-email" required>
+            <input type="email" name="email" id="reset-email" required 
+                   autocapitalize="none" autocorrect="off">
 
             <label for="reset-password">New Password</label>
-            <input type="password" name="new_password" id="reset-password" required>
+            <input type="password" name="new_password" id="reset-password" required 
+                   autocapitalize="none" autocorrect="off" autocomplete="new-password">
 
             <button type="submit">Reset Password</button>
         </form>
@@ -217,16 +222,22 @@
         <h3>Register New User</h3>
         <form method="post" action="/register">
             <label for="register-key">Secret Key</label>
-            <input type="text" name="secret_key" id="register-key" required>
+            <input type="text" name="secret_key" id="register-key" required 
+                   autocapitalize="none" autocorrect="off">
 
             <label for="register-username">Username</label>
-            <input type="text" name="username" id="register-username" required>
+            <input type="text" name="username" id="register-username" required 
+                   autocapitalize="none" autocorrect="off">
 
             <label for="register-email">Email</label>
-            <input type="email" name="email" id="register-email" required>
+            <input type="email" name="email" id="register-email" required 
+                   autocapitalize="none" autocorrect="off">
 
             <label for="register-password">Password</label>
-            <input type="password" name="password" id="register-password" required oninput="checkRegisterPasswordStrength()">
+            <input type="password" name="password" id="register-password" required 
+                   oninput="checkRegisterPasswordStrength()" 
+                   autocapitalize="none" autocorrect="off" autocomplete="new-password">
+
             <small id="register-strength-msg" style="font-size: 12px;"></small>
 
             <div class="show-password" style="margin-top: 8px; font-size: 14px;">
@@ -237,6 +248,8 @@
         </form>
     </div>
 </div>
+
+</body>
 
 <script>
     function openModal() {
@@ -292,5 +305,5 @@
     }
 </script>
 
-</body>
+
 </html>

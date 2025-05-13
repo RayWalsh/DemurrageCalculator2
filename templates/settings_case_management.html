@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Management Settings</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+    }
+
+    .settings-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      background-color: #fff;
+      border-right: 1px solid #ddd;
+      padding: 1.5rem 1rem;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar li {
+      margin-bottom: 1rem;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #004080;
+      font-weight: bold;
+    }
+
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+
+    .settings-panel {
+      flex-grow: 1;
+      padding: 2rem;
+    }
+
+    .settings-panel h3 {
+      margin-top: 0;
+      color: #004080;
+    }
+
+    section {
+      margin-bottom: 3rem;
+    }
+
+    button {
+      background-color: #004080;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #003060;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  {% include '_header.html' %}
+
+  <div class="settings-container">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="#general">General Settings</a></li>
+        <li><a href="#columns">Manage Columns</a></li>
+        <li><a href="#appearance">Table Appearance</a></li>
+      </ul>
+    </aside>
+
+    <main class="settings-panel">
+      <section id="general">
+        <h3>General Settings</h3>
+        <p>Define defaults, data sources, or workflow settings here (coming soon).</p>
+      </section>
+
+      <section id="columns">
+        <h3>Manage Columns</h3>
+        <button>Add New Column</button>
+        <p style="margin-top: 1rem;">View and configure the case data fields used in the Case Management interface.</p>
+      </section>
+
+      <section id="appearance">
+        <h3>Table Appearance</h3>
+        <label><input type="checkbox" checked /> Show column borders</label>
+        <label><input type="checkbox" /> Alternate row colors</label>
+      </section>
+    </main>
+  </div>
+
+</body>
+</html>
