@@ -38,9 +38,20 @@ field_mapping = {
     "Field_EOSP": "EOSP",
     "Field_NORT": "NOR Tendered",
     "Field_POB": "Pilot On Board",
-    "Field_HeaveAnchor": "Heave Anchor",
-    "Field_AllFast": "All fast",
-    "Field_COSP": "COSP"
+    "Field_AllFast": "All Fast",
+    "Field_COSP": "COSP",
+    "Field_HoseConnected": "Hose Connected",
+    "Field_HoseDisconnected": "Hose Disconnected",
+    "Field_CommencedLoading": "Commenced Loading",
+    "Field_CompletedLoading": "Completed Loading",
+    "Field_CommencedDischarge": "Commenced Discharge",
+    "Field_CompletedDisch": "Completed Discharge",
+    "Field_CompletedDrifting": "Completed Drifting",
+    "Field_DocumentsOnboard": "Documents On Board",
+    "Field_DocumentsCompleted": "Documents Completed",
+    "Field_GangwayDown": "Gangway Down",
+    "Field_Anchored": "Anchored",
+    "Field_AnchorAweigh": "Anchor Aweigh"
 }
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
