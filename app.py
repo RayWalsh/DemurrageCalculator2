@@ -30,7 +30,7 @@ conn_str = (
 # === Azure Configuration ===
 AZURE_ENDPOINT = "https://sofparser.cognitiveservices.azure.com/"
 AZURE_KEY = "5Dr8xxzZcVxvgocaypa1kNY06HYpRNmC4KlY0cmpZfvD6P75uFUpJQQJ99BDACmepeSXJ3w3AAALACOGUZXS"
-MODEL_ID = "SOFEvents2"
+MODEL_ID = "SOFPArser3"
 AZURE_CLIENT = DocumentIntelligenceClient(endpoint=AZURE_ENDPOINT, credential=AzureKeyCredential(AZURE_KEY))
 
 # === Field Mapping ===
