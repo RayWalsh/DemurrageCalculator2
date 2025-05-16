@@ -72,6 +72,24 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("columnPrefs", JSON.stringify(prefs));
   };
 
+  function updateColumnPrefsFromSQL() {
+    const currentPrefs = getColumnPrefs();
+    const currentKeys = currentPrefs.map(c => c.key);
+
+    sqlColumns.forEach(col => {
+      if (!currentKeys.includes(col.name)) {
+        currentPrefs.push({
+          key: col.name,
+          label: col.name,
+          visible: false
+        });
+      }
+    });
+
+    setColumnPrefs(currentPrefs);
+  }
+
+
 function renderHeader() {
   const prefs = getColumnPrefs().filter(col => col.visible);
   headerRow.innerHTML = "";
@@ -211,7 +229,7 @@ function filterRecords(records, query) {
         const checkbox = li.querySelector("input[type='checkbox']");
         const label = li.querySelector("label");
         return {
-          key: defaultColumns.find(col => col.label === label.textContent).key,
+          key: checkbox.dataset.key,
           label: label.textContent,
           visible: checkbox.checked
         };
@@ -249,6 +267,7 @@ function renderColumnPicker() {
     checkbox.type = "checkbox";
     checkbox.checked = col.visible;
     checkbox.id = `col-${i}`;
+    checkbox.dataset.key = col.key; 
 
     const label = document.createElement("label");
     label.setAttribute("for", `col-${i}`);
@@ -349,21 +368,31 @@ function sortRecords() {
 }
 
   // Initial fetch
+  let sqlColumns = []; // holds dynamic column info
   let allRecords = [];
-  let originalRecords = []; // this will store the untouched original data
+  let originalRecords = [];
   let currentSortKey = null;
   let currentSortDirection = "asc";
 
-  fetch("/api/cases")
+  // First fetch the SQL columns
+  fetch("/api/case-columns")
+    .then(res => res.json())
+    .then(columns => {
+      sqlColumns = columns.filter(col => col.name !== "CaseID");
+      updateColumnPrefsFromSQL();
+
+      // Then fetch the actual case data
+      return fetch("/api/cases");
+    })
     .then(res => res.json())
     .then(data => {
       allRecords = data;
-      originalRecords = [...data]; // save the original unmodified order
+      originalRecords = [...data];
       renderHeader();
       renderTable(allRecords);
     })
     .catch(err => {
-      console.error("Failed to load cases:", err);
+      console.error("Error loading data:", err);
     });
 
 const globalSearch = document.getElementById("globalSearch");

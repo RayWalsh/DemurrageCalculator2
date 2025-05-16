@@ -375,3 +375,45 @@ th {
 .white-logo {
   filter: brightness(0) invert(1);
 }
+/*Settings page specific styling */
+
+.settings-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-nav a {
+  display: block;
+  padding: 8px 12px;
+  font-weight: bold;
+  color: #004080;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.settings-nav a:hover {
+  background-color: #e0ebf5;
+}
+
+.settings-nav a.active {
+  background-color: #d0e3fa;
+  color: #002b50;
+}
+
+.settings-columns-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.settings-columns-left {
+  flex: 1;
+  min-width: 200px;
+}
+
+.settings-columns-right {
+  flex: 1;
+  min-width: 300px;
+}

@@ -4,114 +4,243 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Case Management Settings</title>
-
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: #f8f9fa;
-    }
-
-    .settings-container {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      width: 240px;
-      background-color: #fff;
-      border-right: 1px solid #ddd;
-      padding: 1.5rem 1rem;
-    }
-
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .sidebar li {
-      margin-bottom: 1rem;
-    }
-
-    .sidebar a {
-      text-decoration: none;
-      color: #004080;
-      font-weight: bold;
-    }
-
-    .sidebar a:hover {
-      text-decoration: underline;
-    }
-
-    .settings-panel {
-      flex-grow: 1;
-      padding: 2rem;
-    }
-
-    .settings-panel h3 {
-      margin-top: 0;
-      color: #004080;
-    }
-
-    section {
-      margin-bottom: 3rem;
-    }
-
-    button {
-      background-color: #004080;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      font-size: 14px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #003060;
-    }
-
-    label {
-      display: block;
-      margin-top: 1rem;
-    }
-  </style>
 </head>
 <body>
 
   {% include '_header.html' %}
 
-  <div class="settings-container">
-    <aside class="sidebar">
-      <ul>
-        <li><a href="#general">General Settings</a></li>
-        <li><a href="#columns">Manage Columns</a></li>
-        <li><a href="#appearance">Table Appearance</a></li>
+  <div class="flex-container">
+      <aside class="section" style="flex: 0 0 240px; border-right: 1px solid #ddd;">
+        <ul class="settings-nav">
+        <li><a data-page="general" class="active">General Settings</a></li>
+        <li><a data-page="columns">Manage Columns</a></li>
+        <li><a data-page="appearance">Table Appearance</a></li>
       </ul>
     </aside>
 
-    <main class="settings-panel">
-      <section id="general">
-        <h3>General Settings</h3>
-        <p>Define defaults, data sources, or workflow settings here (coming soon).</p>
-      </section>
-
-      <section id="columns">
-        <h3>Manage Columns</h3>
-        <button>Add New Column</button>
-        <p style="margin-top: 1rem;">View and configure the case data fields used in the Case Management interface.</p>
-      </section>
-
-      <section id="appearance">
-        <h3>Table Appearance</h3>
-        <label><input type="checkbox" checked /> Show column borders</label>
-        <label><input type="checkbox" /> Alternate row colors</label>
-      </section>
+    <main class="section" id="settings-content" style="flex-grow: 1;">
+      <!-- Content dynamically inserted here -->
     </main>
   </div>
+
+  <!-- Column Editor Modal -->
+  <div class="sof-modal" id="column-editor-modal" style="display: none;">
+    <div class="sof-modal-content">
+      <h3>Edit Column</h3>
+      <p><strong id="col-name"></strong></p>
+
+      <label for="friendly-type">Field Type</label>
+      <select id="friendly-type">
+        <option>Text</option>
+        <option>Paragraph</option>
+        <option>Number</option>
+        <option>Decimal Number</option>
+        <option>Date/Time</option>
+        <option>Yes/No</option>
+        <option>ID / Reference</option>
+        <option>File Upload</option>
+        <option>Other</option>
+      </select>
+
+      <label for="field-label">Field Label</label>
+      <input type="text" id="field-label" />
+
+      <div style="text-align: right;">
+        <button onclick="saveColumnChanges()">Save</button>
+        <button onclick="closeColumnEditor()" style="background-color: #999;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sof-modal" id="new-column-modal" style="display: none;">
+     <div class="sof-modal-content">
+      <h3>Add New Column</h3>
+
+      <label for="new-column-name">Column Name</label>
+      <input type="text" id="new-column-name" placeholder="e.g. CustomField1" />
+
+      <label for="new-column-type">Column Type</label>
+      <select id="new-column-type">
+        <option>Text</option>
+        <option>Paragraph</option>
+        <option>Number</option>
+        <option>Decimal Number</option>
+        <option>Date/Time</option>
+        <option>Yes/No</option>
+      </select>
+
+      <div style="text-align: right;">
+        <button onclick="createNewColumn()">Create</button>
+        <button onclick="closeNewColumnModal()" style="background-color: #999;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const contentEl = document.getElementById('settings-content');
+
+      const pages = {
+        general: `
+          <section class="section">
+            <h3>General Settings</h3>
+            <p>Define defaults, data sources, or workflow settings here (coming soon).</p>
+          </section>
+        `,
+      columns: `
+        <section class="section">
+          <h3>Manage Columns</h3>
+          <div class="settings-columns-layout">
+            <div class="settings-columns-left">
+              <p><strong>How to use this section:</strong></p>
+              <p>You can click any column on the right to edit its display name and field type. In future, you’ll be able to hide, reorder, or lock fields too.</p>
+              <button onclick="openNewColumnModal()">+ Add New Column</button>
+            </div>
+            <div class="settings-columns-right">
+              <ul class="settings-column-list" id="column-list">
+                <li>Loading columns...</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        `
+        ,
+        appearance: `
+          <section class="section">
+            <h3>Table Appearance</h3>
+            <label><input type="checkbox" checked /> Show column borders</label>
+            <label><input type="checkbox" /> Alternate row colors</label>
+          </section>
+        `
+      };
+
+      function friendlyTypeFromSQLType(sqlType) {
+        const type = sqlType.toLowerCase();
+        if (["int", "bigint", "smallint", "tinyint"].includes(type)) return "Number";
+        if (["decimal", "numeric", "float", "real", "money"].includes(type)) return "Decimal Number";
+        if (type === "bit") return "Yes/No";
+        if (["datetime", "datetime2", "smalldatetime", "date", "datetimeoffset"].includes(type)) return "Date/Time";
+        if (["nchar", "nvarchar", "varchar", "char", "text"].includes(type)) return "Text";
+        if (["ntext", "nvarchar(max)", "varchar(max)"].includes(type)) return "Paragraph";
+        if (type === "uniqueidentifier") return "ID / Reference";
+        if (["varbinary", "image", "binary"].includes(type)) return "File Upload";
+        return "Other";
+      }
+
+      function loadPage(pageKey) {
+        contentEl.innerHTML = pages[pageKey];
+
+        document.querySelectorAll('a[data-page]').forEach(link => {
+          link.classList.remove('active');
+          if (link.dataset.page === pageKey) {
+            link.classList.add('active');
+          }
+        });
+
+        if (pageKey === 'columns') {
+          fetch('/api/case-columns')
+            .then(res => res.json())
+            .then(columns => {
+              const list = document.getElementById('column-list');
+              if (Array.isArray(columns)) {
+                list.innerHTML = '';
+                columns.forEach(col => {
+                  const item = document.createElement('li');
+                  item.className = 'settings-column-item';
+                  const friendly = friendlyTypeFromSQLType(col.type);
+
+                  item.innerHTML = `
+                    <span><strong>${col.name}</strong></span>
+                    <span>${friendly} <small style="color:#888;">(${col.type})</small></span>
+                  `;
+                  item.addEventListener('click', () => openColumnEditor(col.name, col.type));
+                  list.appendChild(item);
+                });
+              } else {
+                list.innerHTML = '<li>Error loading columns</li>';
+              }
+            })
+            .catch(err => {
+              console.error('Failed to fetch columns:', err);
+              document.getElementById('column-list').innerHTML = '<li>Error loading columns</li>';
+            });
+        }
+      }
+
+      document.querySelectorAll('a[data-page]').forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          loadPage(this.dataset.page);
+        });
+      });
+
+      loadPage('general');
+    });
+
+    function openColumnEditor(name, sqlType) {
+      document.getElementById('col-name').textContent = name;
+      document.getElementById('field-label').value = name;
+      document.getElementById('friendly-type').value = friendlyTypeFromSQLType(sqlType);
+      document.getElementById('column-editor-modal').style.display = 'flex';
+    }
+
+    function closeColumnEditor() {
+      document.getElementById('column-editor-modal').style.display = 'none';
+    }
+
+    function saveColumnChanges() {
+      const name = document.getElementById('col-name').textContent;
+      const label = document.getElementById('field-label').value;
+      const friendlyType = document.getElementById('friendly-type').value;
+
+      console.log('Saving column:', { name, label, friendlyType });
+      closeColumnEditor();
+    }
+
+    function openNewColumnModal() {
+      document.getElementById('new-column-name').value = '';
+      document.getElementById('new-column-type').value = 'Text';
+      document.getElementById('new-column-modal').style.display = 'flex';
+    }
+
+    function closeNewColumnModal() {
+      document.getElementById('new-column-modal').style.display = 'none';
+    }
+
+    function createNewColumn() {
+      const name = document.getElementById('new-column-name').value.trim();
+      const friendlyType = document.getElementById('new-column-type').value;
+
+      if (!name.match(/^[A-Za-z_][A-Za-z0-9_]*$/)) {
+        alert("Invalid column name. Use only letters, numbers, and underscores. Must not start with a number.");
+        return;
+      }
+
+      fetch('/api/add-column', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, friendlyType })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(`✅ Column "${name}" added successfully.`);
+          closeNewColumnModal();
+          loadPage('columns'); // reload columns
+        } else {
+          alert(`❌ Error: ${data.error}`);
+        }
+      })
+      .catch(err => {
+        console.error('Add column failed:', err);
+        alert('❌ Server error while adding column.');
+      });
+    }
+  
+  
+  </script>
 
 </body>
 </html>

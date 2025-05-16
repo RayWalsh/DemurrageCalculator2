@@ -59,17 +59,19 @@
 
       <article class="changelog-entry">
         <h4>v1.3 – May 2025</h4>
-        <ul>
-          <li><strong>Export to CSV:</strong> Users can now download the visible case table as a CSV file from the Case Management page.</li>
-          <li><strong>Global Search Bar:</strong> A new top-right search input allows users to filter all visible table rows across all columns in real time.</li>
-          <li><strong>Column Picker (Field Selector):</strong> Users can show or hide columns using the cog icon, and their preferences are saved.</li>
-          <li><strong>Column Sorting:</strong> Users can sort the case table by clicking any column header (toggle between ascending and descending).</li>
-        </ul>
+          <ul>
+            <li><strong>Column Management Settings Panel:</strong> A new dedicated settings page at <code>/settings/case-management</code> allows viewing and managing SQL columns.</li>
+            <li><strong>Add New Column:</strong> Users can add new columns to the <code>Cases</code> SQL table via a modal. Column types are user-friendly (e.g. "Text", "Decimal").</li>
+            <li><strong>Dynamic Column Detection:</strong> New SQL columns are detected and automatically added to the column picker in Case Management (hidden by default).</li>
+            <li><strong>Edit Column Details:</strong> Users can rename and change the friendly field type of existing columns via a modal editor in the settings panel.</li>
+            <li><strong>Settings Modals Load On Demand:</strong> Modals for editing or adding columns are hidden by default and only appear when triggered.</li>
+          </ul>
 
-        <h5>Changed</h5>
-        <ul>
-          <li><strong>Interface Simplification:</strong> Removed row-based action buttons from the table; all case actions are now handled through the Edit Case modal (accessed by clicking DeepBlueRef).</li>
-        </ul>
+          <h5>Changed</h5>
+          <ul>
+            <li><strong>Column Picker Logic:</strong> Local storage preferences now merge with real SQL column metadata on page load, ensuring the UI adapts to new fields.</li>
+          </ul>
+
       </article>
 
       <article class="changelog-entry">

@@ -102,6 +102,79 @@ def case_management_settings():
 
 # === API Routes ===
 
+@app.route('/api/case-columns', methods=['GET'])
+def get_case_columns():
+    try:
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Fetch column metadata from INFORMATION_SCHEMA
+        cursor.execute("""
+            SELECT COLUMN_NAME, DATA_TYPE
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = 'Cases'
+            ORDER BY ORDINAL_POSITION
+        """)
+
+        columns = [{"name": row[0], "type": row[1]} for row in cursor.fetchall()]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(columns), 200
+    except Exception as e:
+        print("Error fetching columns:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/add-column", methods=["POST"])
+def add_column():
+    try:
+        data = request.get_json()
+        name = data.get("name")
+        friendly_type = data.get("friendlyType")
+
+        # Validate column name
+        if not name or not name.strip().isalnum() or not name[0].isalpha():
+            return jsonify({"success": False, "error": "Invalid column name"}), 400
+
+        # Map friendly type to SQL type
+        sql_type_map = {
+            "Text": "NVARCHAR(255)",
+            "Paragraph": "NVARCHAR(MAX)",
+            "Number": "INT",
+            "Decimal Number": "DECIMAL(18,2)",
+            "Date/Time": "DATETIME",
+            "Yes/No": "BIT"
+        }
+
+        sql_type = sql_type_map.get(friendly_type)
+        if not sql_type:
+            return jsonify({"success": False, "error": f"Unsupported field type: {friendly_type}"}), 400
+
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Check if the column already exists
+        cursor.execute("""
+            SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'Cases' AND COLUMN_NAME = ?
+        """, (name,))
+        if cursor.fetchone():
+            return jsonify({"success": False, "error": f"Column '{name}' already exists"}), 400
+
+        # Add the new column
+        alter_sql = f"ALTER TABLE Cases ADD [{name}] {sql_type};"
+        cursor.execute(alter_sql)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        print("Error in /api/add-column:", str(e))
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/parse-sof', methods=['POST'])
 def parse_sof():
