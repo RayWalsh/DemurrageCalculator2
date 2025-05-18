@@ -417,3 +417,84 @@ th {
   flex: 1;
   min-width: 300px;
 }
+
+.settings-column-item.clickable {
+  cursor: pointer;
+}
+
+.settings-column-item.clickable:hover {
+  background-color: #eef4ff;
+}
+
+/* Column Editor Modal Layout Enhancements */
+.sof-modal-content .form-group {
+  margin-bottom: 16px;
+}
+
+.sof-modal-content .form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.sof-modal-content .form-group select,
+.sof-modal-content .form-group input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.sof-modal-content .readonly-input {
+  background-color: #f9f9f9;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Modal Button Row */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.modal-buttons .primary-btn,
+.modal-buttons .secondary-btn,
+.modal-buttons .danger-btn {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background-color: #004080;
+  color: white;
+}
+
+.secondary-btn {
+  background-color: #ccc;
+  color: #222;
+}
+
+.danger-btn {
+  background-color: #b00020;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #003060;
+}
+
+.secondary-btn:hover {
+  background-color: #bbb;
+}
+
+.danger-btn:hover {
+  background-color: #900018;
+}

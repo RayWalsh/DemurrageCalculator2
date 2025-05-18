@@ -176,6 +176,36 @@ def add_column():
         print("Error in /api/add-column:", str(e))
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route('/api/delete-column/<string:column_name>', methods=['DELETE'])
+def delete_column(column_name):
+    try:
+        if column_name in ("CaseID", "DeepBlueRef"):
+            return jsonify({"success": False, "error": "Cannot delete protected column."}), 403
+
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Check column exists
+        cursor.execute("""
+            SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = 'Cases' AND COLUMN_NAME = ?
+        """, (column_name,))
+        if not cursor.fetchone():
+            return jsonify({"success": False, "error": "Column does not exist"}), 404
+
+        # Execute ALTER TABLE DROP COLUMN
+        cursor.execute(f"ALTER TABLE Cases DROP COLUMN [{column_name}]")
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        print("Error deleting column:", str(e))
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route('/api/parse-sof', methods=['POST'])
 def parse_sof():
     if 'pdf' not in request.files:
